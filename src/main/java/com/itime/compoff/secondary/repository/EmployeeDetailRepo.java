@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public interface EmployeeDetailRepo
         extends JpaRepository<EmployeeDetail, Long>, JpaSpecificationExecutor<EmployeeDetail> {
 
+    Optional<EmployeeDetail> findByIdAndEmpStatus(Long id, Integer binary);
 
 }

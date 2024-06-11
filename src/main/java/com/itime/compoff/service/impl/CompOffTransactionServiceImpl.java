@@ -31,7 +31,7 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
 
     @Override
     @Transactional(rollbackOn = CommonException.class)
-    public HttpStatus createCompOffTransaction(CompOffApplyRequest compOffApplyRequest) {
+    public HttpStatus createCompOffTransaction(CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
         EmployeeDetail employeeDetails = businessValidationService.getEmployee(compOffApplyRequest.getEmployeeId().toString());
 

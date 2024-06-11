@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
-@Table(name = "eib_emp_detail")
+@Table(name = "eib_employee_detail")
 public class EmployeeDetail implements Serializable {
 
     @Serial

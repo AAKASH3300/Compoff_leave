@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class CompOffApplyRequest {
     private Long employeeId;
-    private String requestType;
     private String requestedDate;
     private String punchIn;
     private String punchOut;

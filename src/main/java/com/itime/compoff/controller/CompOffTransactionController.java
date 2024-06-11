@@ -1,6 +1,7 @@
 package com.itime.compoff.controller;
 
 
+import com.itime.compoff.exception.CommonException;
 import com.itime.compoff.model.CompOffApplyRequest;
 import com.itime.compoff.service.CompOffTransactionService;
 import org.slf4j.Logger;
@@ -23,10 +24,11 @@ public class CompOffTransactionController {
     CompOffTransactionService compOffTransactionService;
 
     @PostMapping(value = "/apply", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public HttpStatus saveCompOffTransaction(@RequestBody CompOffApplyRequest compOffApplyRequest) {
+    public HttpStatus saveCompOffTransaction(@RequestBody CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
         log.info("CompOff request created....");
         return compOffTransactionService.createCompOffTransaction(compOffApplyRequest);
 
     }
+
 }

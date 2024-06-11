@@ -8,6 +8,7 @@ import com.itime.compoff.enumeration.EnumStatus;
 import com.itime.compoff.model.CompOffApplyRequest;
 import com.itime.compoff.primary.entity.CompOffTransaction;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
+import com.itime.compoff.utils.AppConstants;
 import com.itime.compoff.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,14 +25,18 @@ public class CompOffMapper {
         compOffTransaction.setEmployeeId(employeeDetails.getId());
         compOffTransaction.setRequestedDt(Timestamp.valueOf(compOffApplyRequest.getRequestedDate()));
         compOffTransaction.setApproverId(employeeDetails.getApproverId().getId());
-        compOffTransaction.setPunchInTime(Time.valueOf(compOffApplyRequest.getPunchIn()));
-        compOffTransaction.setPunchOutTime(Time.valueOf(compOffApplyRequest.getPunchOut()));
+
+        compOffTransaction.setPunchInTime(Time.valueOf(compOffApplyRequest.getPunchIn().concat(AppConstants.TIME_CONCAT)));
+        compOffTransaction.setPunchOutTime(Time.valueOf(compOffApplyRequest.getPunchOut().concat(AppConstants.TIME_CONCAT)));
         compOffTransaction.setWorkHours(Double.valueOf(compOffApplyRequest.getWorkHours()));
+
         compOffTransaction.setCancellationReason(compOffApplyRequest.getReason());
         compOffTransaction.setApproverRemarks(compOffApplyRequest.getReason());
         compOffTransaction.setRequestedFor(EnumCompOffPeriod.valueOf(compOffApplyRequest.getRequestedFor()));
+        compOffTransaction.setApprovedFor(EnumCompOffPeriod.valueOf(compOffApplyRequest.getRequestedFor()));
         compOffTransaction.setTransactionStatus(EnumCompOffTransactionStatus.PENDING);
         compOffTransaction.setCompOffUsageStatus(EnumCompOffUsageStatus.REQUESTED);
+//        compOffTransaction.setLeaveTransaction();
         compOffTransaction.setStatus(EnumStatus.ACTIVE);
         compOffTransaction.setCreatedBy(employeeDetails.getFirstName());
         compOffTransaction.setLastUpdatedBy(employeeDetails.getFirstName());
