@@ -24,6 +24,7 @@ public class AppConstants {
 
     public static final String DATE_ONLY_FORMAT = "yyyyMMdd";
     public static final String PROPER_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String COMP_OFF_STATUS_UPDATED = "Comp Off status updated";
 
     public static final String TIME_CONCAT = ":00";
     private AppConstants() {

@@ -3,6 +3,7 @@ package com.itime.compoff.utils;
 import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -84,4 +85,11 @@ public class DateTimeUtils {
         }
     }
 
+    public static void copyProperties(Object source, Object target) {
+        BeanUtils.copyProperties(source, target);
+    }
+
+    public static String convertToJsonTimestampDateOnly(final Timestamp timestamp) {
+        return timestamp != null ? new SimpleDateFormat(DateTimeUtils.JSON_DATEONLY_FORMAT).format(timestamp) : null;
+    }
 }

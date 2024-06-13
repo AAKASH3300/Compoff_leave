@@ -3,6 +3,8 @@ package com.itime.compoff.primary.entity;
 
 import com.itime.compoff.enumeration.EnumStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,6 +12,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "eib_leave_type")
+@Getter
+@Setter
 public class LeaveType implements Serializable {
 
 

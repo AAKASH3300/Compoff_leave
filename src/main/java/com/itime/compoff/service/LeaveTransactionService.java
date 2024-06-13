@@ -1,8 +1,13 @@
 package com.itime.compoff.service;
 
+import com.itime.compoff.exception.CommonException;
 import com.itime.compoff.model.LeaveApplyRequest;
-import org.springframework.http.HttpStatus;
+import com.itime.compoff.model.LeaveResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface LeaveTransactionService {
-    HttpStatus applyLeave(LeaveApplyRequest leaveApplyRequest);
+
+    public LeaveResponse saveLeave(LeaveApplyRequest applyLeaverequest, String createdByEmpId) throws CommonException;
+
 }
