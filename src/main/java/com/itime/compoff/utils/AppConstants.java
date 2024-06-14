@@ -1,5 +1,7 @@
 package com.itime.compoff.utils;
 
+import jdk.internal.agent.AgentConfigurationError;
+
 public class AppConstants {
 
     public static final String EMPLOYEE_ID = "employeeId";
@@ -26,7 +28,12 @@ public class AppConstants {
     public static final String PROPER_DATE_FORMAT = "yyyy-MM-dd";
     public static final String COMP_OFF_STATUS_UPDATED = "Comp Off status updated";
 
+    public static final String LEAVE_TYPE_NOT_FOUND = "Leave Type Not Found";
+
     public static final String TIME_CONCAT = ":00";
+    public static final String COMPOFF = "COMPOFF";
+    public static final String ALREADY_COMPOFF_UPDATED = "Comp-Off already updated";
+
     private AppConstants() {
     }
 }

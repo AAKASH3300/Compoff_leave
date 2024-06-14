@@ -1,7 +1,11 @@
 package com.itime.compoff.mapper;
 
+import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.model.LeaveResponse;
+import com.itime.compoff.primary.entity.LeaveSummary;
 import com.itime.compoff.primary.entity.LeaveTransaction;
+import com.itime.compoff.primary.entity.LeaveType;
+import com.itime.compoff.secondary.entity.EmployeeDetail;
 import com.itime.compoff.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -26,5 +30,13 @@ public class LeaveMapper {
         applyLeaveResponse.setCreatedByEmpId(String.valueOf(leaveTransaction.getEmployeeId()));
 
         return applyLeaveResponse;
+    }
+
+    public LeaveSummary mapLeaveSummaryEntityNew(long id) {
+        return null;
+    }
+
+    public LeaveTransaction leaveModelToLeaveEntity(LeaveApplyRequest applyLeaverequest, EmployeeDetail employeeDetail, LeaveType leaveType) {
+        return null;
     }
 }

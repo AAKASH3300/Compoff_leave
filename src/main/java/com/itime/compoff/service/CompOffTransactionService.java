@@ -10,7 +10,7 @@ public interface CompOffTransactionService {
 
     HttpStatus createCompOffTransaction(CompOffApplyRequest compOffApplyRequest) throws CommonException;
 
-    void updateCompOffApproval(String transactionId, String status, String compOffFor);
+    void updateCompOffApproval(String transactionId, String status, String compOffFor) throws CommonException;
 
     void checkForExpiringCompOffs();
 }

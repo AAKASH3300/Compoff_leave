@@ -1,34 +1,77 @@
 package com.itime.compoff.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.sql.Timestamp;
-
-@Getter
-@Setter
 public class LeaveApplyRequest {
 
-    @NotBlank(message = "Employee ID is mandatory")
     private String employeeId;
-
-    @NotNull(message = "Start date is mandatory")
-    private Timestamp startDt;
-
-    @NotNull(message = "End date is mandatory")
-    private Timestamp endDt;
-
-    @NotNull(message = "Number of days is mandatory")
-    @Positive(message = "Number of days must be positive")
-    private Double noOfDays;
-
-    @NotBlank(message = "Reason is mandatory")
-    @Size(max = 255, message = "Reason must be less than 255 characters")
+    private String leaveTypeId;
+    private String startDt;
+    private String endDt;
+    private String noOfDays;
     private String reason;
+    private String leaveForStartDt;
+    private String leaveForEndDt;
 
+    public String getEmployeeId() {
+        return employeeId;
+    }
 
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getLeaveTypeId() {
+        return leaveTypeId;
+    }
+
+    public void setLeaveTypeId(String leaveTypeId) {
+        this.leaveTypeId = leaveTypeId;
+    }
+
+    public String getStartDt() {
+        return startDt;
+    }
+
+    public void setStartDt(String startDt) {
+        this.startDt = startDt;
+    }
+
+    public String getEndDt() {
+        return endDt;
+    }
+
+    public void setEndDt(String endDt) {
+        this.endDt = endDt;
+    }
+
+    public String getNoOfDays() {
+        return noOfDays;
+    }
+
+    public void setNoOfDays(String noOfDays) {
+        this.noOfDays = noOfDays;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getLeaveForStartDt() {
+        return leaveForStartDt;
+    }
+
+    public void setLeaveForStartDt(String leaveForStartDt) {
+        this.leaveForStartDt = leaveForStartDt;
+    }
+
+    public String getLeaveForEndDt() {
+        return leaveForEndDt;
+    }
+
+    public void setLeaveForEndDt(String leaveForEndDt) {
+        this.leaveForEndDt = leaveForEndDt;
+    }
 }
