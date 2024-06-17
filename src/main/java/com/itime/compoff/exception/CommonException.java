@@ -8,11 +8,10 @@ public class CommonException extends Exception{
     private static final long serialVersionUID = 1L;
 
     private final String message;
-    private final Integer code;
 
-    public CommonException(String message, Integer code) {
+    public CommonException(String message) {
         this.message = message;
-        this.code = code;
+
     }
 
     @Override
@@ -20,7 +19,4 @@ public class CommonException extends Exception{
         return message;
     }
 
-    public Integer getCode() {
-        return code;
-    }
 }

@@ -1,15 +1,17 @@
 package com.itime.compoff.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LeaveResponse {
 
 
-    private long id;
-    private String tenantId;
     private String employeeId;
     private String leaveTypeId;
     private String startDt;
@@ -20,17 +22,11 @@ public class LeaveResponse {
     private String leaveForStartDt;
     private String leaveForEndDt;
     private String reportingManager;
-    private String approverRemarks;
     private String status;
     private String appliedOn;
-    private String createdBy;
-    private String lastUpdatedDt;
-    private String lastUpdatedBy;
-    private String leaveTypeName;
-
     private String createdByEmpId;
 
-    private String employeeName;
+
 
 
 

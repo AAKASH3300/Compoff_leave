@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
-@Table(name = "eib_leave_transaction")
+@Table(name = "lms_leave_transaction")
 public class LeaveTransaction implements Serializable{
 
 

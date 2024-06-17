@@ -15,7 +15,6 @@ import java.util.Optional;
 public interface LeaveTypeRepo
         extends JpaRepository<LeaveType, Long>, JpaSpecificationExecutor<LeaveType> {
 
-    Optional<LeaveType> findByIdAndStatus(Long leaveTypeId, EnumStatus enumStatus);
 
-    LeaveType findByEmpIdAndStatus(long employeeDetail, EnumStatus enumStatus);
+    Optional<LeaveType> findByIdAndStatus(Long leaveTypeId, EnumStatus enumStatus);
 }

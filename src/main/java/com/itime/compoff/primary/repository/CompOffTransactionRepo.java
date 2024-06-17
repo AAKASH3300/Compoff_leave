@@ -3,7 +3,6 @@ package com.itime.compoff.primary.repository;
 import com.itime.compoff.enumeration.EnumCompOffTransactionStatus;
 import com.itime.compoff.enumeration.EnumStatus;
 import com.itime.compoff.primary.entity.CompOffTransaction;
-import com.itime.compoff.secondary.entity.EmployeeDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +24,5 @@ public interface CompOffTransactionRepo extends JpaRepository<CompOffTransaction
 
     Optional<CompOffTransaction> findTop1ByIdAndStatus(long id, EnumStatus enumStatus);
 
-    Optional<CompOffTransaction> findTopByEmployeeIdAndRequestedDtAndTransactionStatusIn(EmployeeDetail employeeDetails, Timestamp timestamp, List<EnumCompOffTransactionStatus> pending);
+    Optional<CompOffTransaction> findTopByEmployeeIdAndRequestedDtAndTransactionStatusIn(long employeeDetails, Timestamp timestamp, List<EnumCompOffTransactionStatus> pending);
 }

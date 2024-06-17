@@ -1,17 +1,16 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumApprovalStatus {
 
     PENDING("PENDING"), APPROVED("APPROVED"), REJECTED("REJECTED"), CANCELLED("CANCELLED");
 
-    String approvalStatus;
+    final String approvalStatus;
 
     EnumApprovalStatus(String approvalStatus) {
         this.approvalStatus = approvalStatus;
-    }
-
-    public String getApprovalStatus() {
-        return approvalStatus;
     }
 
     public static EnumApprovalStatus approvalStatusValue(String value) {

@@ -1,0 +1,99 @@
+#Employee Db
+-------------------------------------------------------------------------
+CREATE TABLE `eib_employee_detail` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `emp_id` varchar(20) NOT NULL,
+  `firstname` varchar(20) NOT NULL,
+  `lastname` varchar(20) NOT NULL,
+  `official_email` varchar(50) NOT NULL,
+  `emp_status` int NOT NULL,
+  `approver_id` varchar(20) NOT NULL,
+  `created_by` int NOT NULL,
+  `created_on` timestamp NOT NULL,
+  `updated_by` int NOT NULL,
+  `updated_on` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_emp_id` (`emp_id`)
+);
+
+#Leave and Attendance Db
+-------------------------------------------------------------------------
+CREATE TABLE `eib_leave_summary` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` int NOT NULL,
+  `leave_type_id` bigint unsigned NOT NULL,
+  `period_start_dt` timestamp NOT NULL,
+  `period_end_dt` timestamp NOT NULL,
+  `leaves_taken` decimal(4,1) NOT NULL,
+  `leaves_available` decimal(4,1) NOT NULL,
+  `leave_open` decimal(4,1) DEFAULT NULL,
+  `leave_credit` decimal(4,1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_leavesummary_leavetype_id` (`leave_type_id`),
+  CONSTRAINT `FK_leavesummary_leavetype_id` FOREIGN KEY (`leave_type_id`) REFERENCES `eib_leave_type` (`id`)
+);
+
+CREATE TABLE `eib_leave_summary` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` int NOT NULL,
+  `leave_type_id` bigint unsigned NOT NULL,
+  `period_start_dt` timestamp NOT NULL,
+  `period_end_dt` timestamp NOT NULL,
+  `leaves_taken` decimal(4,1) NOT NULL,
+  `leaves_available` decimal(4,1) NOT NULL,
+  `leave_open` decimal(4,1) DEFAULT NULL,
+  `leave_credit` decimal(4,1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_leavesummary_leavetype_id` (`leave_type_id`),
+  CONSTRAINT `FK_leavesummary_leavetype_id` FOREIGN KEY (`leave_type_id`) REFERENCES `eib_leave_type` (`id`)
+);
+
+CREATE TABLE `lms_comp_off_transaction` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint unsigned NOT NULL,
+  `requested_date` timestamp NOT NULL,
+  `punch_in_time` time NOT NULL,
+  `punch_out_time` time NOT NULL,
+  `work_hours` decimal(4,1) NOT NULL,
+  `reason` varchar(50) DEFAULT NULL,
+  `approver_id` bigint unsigned NOT NULL,
+  `approver_remarks` varchar(50) DEFAULT NULL,
+  `cancellation_reason` varchar(50) DEFAULT NULL,
+  `requested_for` varchar(50) DEFAULT NULL,
+  `approved_for` varchar(50) DEFAULT NULL,
+  `transaction_status` varchar(50) DEFAULT NULL,
+  `compoff_usage_status` varchar(50) DEFAULT NULL,
+  `leave_transaction_id` bigint unsigned DEFAULT NULL,
+  `status` varchar(10) NOT NULL,
+  `created_dt` timestamp NOT NULL,
+  `created_by` varchar(50) NOT NULL,
+  `last_updated_dt` timestamp NOT NULL,
+  `last_updated_by` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_lms_comp_off_leaveTransaction_id` (`leave_transaction_id`),
+  CONSTRAINT `FK_lms_comp_off_leaveTransaction_id` FOREIGN KEY (`leave_transaction_id`) REFERENCES `lms_leave_transaction` (`id`)
+);
+
+CREATE TABLE `lms_leave_transaction` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` int NOT NULL,
+  `leave_type_id` bigint unsigned NOT NULL,
+  `start_dt` timestamp NOT NULL,
+  `end_dt` timestamp NOT NULL,
+  `no_of_days` decimal(4,1) NOT NULL,
+  `leave_status` varchar(20) NOT NULL,
+  `reason` varchar(500) DEFAULT NULL,
+  `leave_for_start_dt` varchar(20) NOT NULL,
+  `leave_for_end_dt` varchar(20) NOT NULL,
+  `cancellation_reason` varchar(500) DEFAULT NULL,
+  `reporting_manager` int NOT NULL,
+  `approver_remarks` varchar(100) DEFAULT NULL,
+  `status` varchar(10) NOT NULL,
+  `created_dt` timestamp NOT NULL,
+  `created_by` varchar(50) NOT NULL,
+  `last_updated_dt` timestamp NOT NULL,
+  `last_updated_by` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_leavetransaction_leavetype_id` (`leave_type_id`),
+  CONSTRAINT `FK_leavetransaction_leavetype_id` FOREIGN KEY (`leave_type_id`) REFERENCES `eib_leave_type` (`id`)
+);
