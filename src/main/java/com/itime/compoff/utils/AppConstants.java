@@ -12,9 +12,7 @@ public class AppConstants {
 
     public static final String LEAVE_TYPE_NOT_FOUND = "Leave Type Not Found";
 
-    public static final String TIME_CONCAT = ":00";
-    public static final String COMPOFF_CODE= "COMPOFF";
-
+    public static final String ERROR = "ERROR";
     public static final String COMPOFF_EXPIRY_NOTIFICATION_EMAIL_TEMPLATE =
             """
                     <html>
@@ -76,6 +74,10 @@ public class AppConstants {
 
     public static final String LEAVE_STATUS_UPDATED = "Leave Status Updated";
     public static final String ALREADY_LEAVE_REQUEST_APPLIED = "Already Leave applied for this date";
+    public static final String LEAVE_SUMMARY_NOT_FOUND = "Leave Summary Not Found";
+    public static final String LEAVE_UNAVAILABLE = "Leave Unavailable";
+    public static final String PARSER_EXCEPTION = "Parse Exception";
+    public static final String EMAIL = "aakash.b@aaludra.com";
 
     private AppConstants() {
     }

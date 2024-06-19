@@ -30,22 +30,28 @@ public class LeaveTransactionController {
     LeaveTransactionService leaveTransactionService;
 
     @Operation(tags = "Leave", summary = "Apply for leave")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+
     @PostMapping(value = "/apply", consumes = MediaType.APPLICATION_JSON_VALUE)
     public LeaveResponse applyLeaveTransaction(@RequestHeader(name = "createdByEmpId", required = false) String createdByEmpId,
                                                @Valid @RequestBody LeaveApplyRequest leaveApplyRequest) throws CommonException {
 
-        log.info("Sending leave apply request......");
+        log.info("Processing leave apply request......");
         return leaveTransactionService.saveLeave(leaveApplyRequest, createdByEmpId);
 
     }
 
     @Operation(tags = "Leave", summary = "Approve/Reject Leave request")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+
     @GetMapping(value = "/approval", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateLeaveStatus(@RequestParam(name = "transactionId", required = true) String transactionId,
                                                     @RequestParam(name = "transactionStatus", required = true) String transactionStatus,
@@ -53,8 +59,8 @@ public class LeaveTransactionController {
                                                     @RequestParam(name = "comment", required = true) String comment) throws CommonException {
 
 
-        log.trace("Leave Status updated....");
-        leaveTransactionService.updateLeave(transactionId, transactionStatus, employeeId,comment);
+        log.trace("Updating Leave Status....");
+        leaveTransactionService.updateLeaveTransaction(transactionId, transactionStatus, employeeId, comment);
 
         return ResponseEntity.ok(ResourcesUtils.stringFormater(AppConstants.LEAVE_STATUS_UPDATED, transactionStatus.toLowerCase()));
 

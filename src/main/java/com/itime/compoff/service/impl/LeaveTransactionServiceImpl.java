@@ -1,6 +1,5 @@
 package com.itime.compoff.service.impl;
 
-import com.itime.compoff.controller.CompOffTransactionController;
 import com.itime.compoff.enumeration.EnumLeaveStatus;
 import com.itime.compoff.enumeration.EnumStatus;
 import com.itime.compoff.exception.*;
@@ -53,10 +52,14 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
         EmployeeDetail employee = businessValidationService.findEmployeeDetail(Long.parseLong(applyLeaveRequest.getEmployeeId()));
 
         LeaveType leaveType = this.getLeaveType(Long.valueOf(applyLeaveRequest.getLeaveTypeId()));
+
         businessValidationService.duplicateLeaveCheck(employee, applyLeaveRequest);
+
         LeaveTransaction transactionResponse = leaveMapper.leaveModelToLeaveEntity(applyLeaveRequest, employee, leaveType);
         LeaveTransaction leaveTransaction = leaveTransactionRepo.save(transactionResponse);
-        this.buildLeaveSummary(leaveType, applyLeaveRequest, leaveTransaction);
+
+        this.buildLeaveSummary(leaveType, applyLeaveRequest);
+
         return leaveMapper.leaveEntityToModel(leaveTransaction);
     }
 
@@ -65,26 +68,33 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
                 () -> new DataNotFoundException(AppConstants.LEAVE_TYPE_NOT_FOUND));
     }
 
-    private void buildLeaveSummary(LeaveType leaveType, LeaveApplyRequest applyLeaverequest, LeaveTransaction leaveTransaction) throws DataNotFoundException {
+    private void buildLeaveSummary(LeaveType leaveType, LeaveApplyRequest applyLeaveRequest) throws CommonException {
 
-        EmployeeDetail employee = businessValidationService.findEmployeeDetail(Long.parseLong(applyLeaverequest.getEmployeeId()));
+        EmployeeDetail employee = businessValidationService.findEmployeeDetail(Long.parseLong(applyLeaveRequest.getEmployeeId()));
 
         Optional<LeaveSummary> leaveSummary = leaveSummaryRepo.findByLeaveTypeIdAndEmployeeId(leaveType, employee.getId());
         if (leaveSummary.isEmpty()) {
             LeaveSummary leaveSummaryData = leaveMapper.mapLeaveSummaryEntityNew(leaveType, employee.getId());
-            leaveSummaryData.setLeavesAvailable(Double.parseDouble(applyLeaverequest.getNoOfDays()));
-            leaveSummaryData.setLeavesTaken(Double.valueOf(applyLeaverequest.getNoOfDays()));
-            leaveSummaryData.setLeaveOpen(3.0);
-            leaveSummaryData.setLeavesAvailable(0.0);
+            Double currentLeaves = leaveSummaryData.getLeavesTaken();
+            if (currentLeaves != null) {
+                leaveSummaryData.setLeavesTaken(currentLeaves + Double.parseDouble(applyLeaveRequest.getNoOfDays()));
+            } else {
+                leaveSummaryData.setLeavesTaken(Double.parseDouble(applyLeaveRequest.getNoOfDays()));
+            }
+            leaveSummaryData.setLeavesAvailable(Double.parseDouble(applyLeaveRequest.getNoOfDays()));
             leaveSummaryRepo.save(leaveSummaryData);
+        } else {
+            log.info("Checking for leave availability leaves");
+            businessValidationService.validateAvailableLeave(leaveSummary, Double.valueOf(applyLeaveRequest.getNoOfDays()));
+
         }
     }
 
-    public void updateLeave(String transactionId, String status, String employeeId, String comment) throws CommonException {
+    public void updateLeaveTransaction(String transactionId, String status, String employeeId, String comment) throws CommonException {
 
-        log.trace("Getting leave transaction by id");
-        LeaveTransaction leaveTransaction = leaveTransactionRepo.findById(Long.valueOf(transactionId)).orElseThrow(
-                () -> new DataNotFoundException(ErrorMessages.RECORD_NOT_FOUND));
+        log.trace("Getting leave transaction by transaction id");
+        LeaveTransaction leaveTransaction = leaveTransactionRepo.findById(Long.valueOf(transactionId))
+                .orElseThrow(() -> new DataNotFoundException(ErrorMessages.RECORD_NOT_FOUND));
 
         businessValidationService.findEmployeeDetail(leaveTransaction.getEmployeeId());
 
@@ -93,20 +103,56 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
 
             if (leaveTransaction.getLeaveStatus().equals(EnumLeaveStatus.PENDING)) {
 
-                leaveTransaction.setLeaveStatus(EnumLeaveStatus.APPROVED);
+                leaveTransaction.setLeaveStatus(EnumLeaveStatus.leaveStatusValue(status));
                 leaveTransaction.setApproverRemarks(comment);
                 leaveTransaction.setLastUpdatedBy(reportingManager.getFirstName());
                 leaveTransaction.setLastUpdatedDt(DateTimeUtils.getCurrentTimeStamp());
                 leaveTransactionRepo.save(leaveTransaction);
+                this.updateLeaveSummary(leaveTransaction);
             } else {
                 throw new StatusException(
                         ResourcesUtils.stringFormater(AppConstants.ALREADY_LEAVE_REQUEST_APPLIED, String.valueOf(leaveTransaction.getLeaveStatus()).toLowerCase()));
             }
         } else {
-
             throw ApplicationErrorCode.INVALID_REQUEST.getError()
                     .commonApplicationError(HttpStatus.BAD_REQUEST.value());
         }
+    }
+
+    private LeaveSummary updateLeaveSummary(LeaveTransaction leaveTransaction) {
+
+        log.info("Updating leave summary");
+        Optional<LeaveSummary> leaveSummary = leaveSummaryRepo.findByLeaveTypeIdAndEmployeeId(leaveTransaction.getLeaveTypeId(), leaveTransaction.getEmployeeId());
+
+        Double availableLeaves = 0.0;
+        Double leaveTaken;
+        Long leaveSummeryId = 0L;
+        Double leaveOpen = 0.0;
+        Double leaveCredit = 0.0;
+
+        if (leaveSummary.isPresent()) {
+            leaveSummeryId = leaveSummary.get().getId();
+            leaveOpen = leaveSummary.get().getLeaveOpen();
+            leaveCredit = leaveSummary.get().getLeaveCredit();
+            if (leaveTransaction.getLeaveStatus().equals(EnumLeaveStatus.REJECTED)
+                    || leaveTransaction.getLeaveStatus().equals(EnumLeaveStatus.CANCELLED)) {
+                leaveTaken = leaveSummary.get().getLeavesTaken() - leaveTransaction.getNoOfDays();
+                availableLeaves = leaveSummary.get().getLeavesAvailable() + leaveTransaction.getNoOfDays();
+            } else {
+                leaveTaken = leaveSummary.get().getLeavesTaken() + leaveTransaction.getNoOfDays();
+                availableLeaves = leaveSummary.get().getLeavesAvailable() - leaveTransaction.getNoOfDays();
+            }
+        } else {
+            Optional<LeaveType> leaveType = leaveTypeRepo.findById(leaveTransaction.getLeaveTypeId().getId());
+            if (leaveType.isPresent()) {
+                availableLeaves = leaveType.get().getLeavesAllowed() - leaveTransaction.getNoOfDays();
+            }
+            leaveTaken = leaveTransaction.getNoOfDays();
+        }
+        log.info("Leave summary updated successfully");
+        return leaveSummaryRepo
+                .save(leaveMapper.mapLeaveSummaryEntity(leaveTransaction, availableLeaves, leaveTaken, leaveSummeryId, leaveOpen, leaveCredit));
+
     }
 }
 

@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumCompOffTransactionStatus {
 
     PENDING("PENDING"), APPROVED("APPROVED"), REJECTED("REJECTED"), CANCELLED("CANCELLED");
@@ -8,10 +11,6 @@ public enum EnumCompOffTransactionStatus {
 
     EnumCompOffTransactionStatus(String compOffStatus) {
         this.compOffStatus = compOffStatus;
-    }
-
-    public String getCompOffStatus() {
-        return compOffStatus;
     }
 
     public static EnumCompOffTransactionStatus compOffStatusValue(String value) {

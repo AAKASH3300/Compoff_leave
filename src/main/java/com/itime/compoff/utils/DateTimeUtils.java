@@ -1,10 +1,15 @@
 package com.itime.compoff.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
@@ -13,16 +18,6 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 public class DateTimeUtils {
 
     private static final String JSON_DATEONLY_FORMAT = "yyyyMMdd";
-
-    private static final String TIME_STAMPFORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final String PROPER_DATE_FORMAT = "yyyy-MM-dd";
-
-    private static final String TIME = "HH:mm";
-    private static final String HOUR = "HH";
-    private static final String MIN = "mm";
-    private static final String SECOND = "ss";
-    private static final String TIME_VALUE = "HH:mm:ss";
-    private static final String DATE = "dd/MM/yyyy";
 
     private static LocalDate now = LocalDate.now();
     private static LocalDate firstDay = now.with(firstDayOfYear());
@@ -56,4 +51,10 @@ public class DateTimeUtils {
     public static String convertToJsonTimestampDateOnly(final Timestamp timestamp) {
         return timestamp != null ? new SimpleDateFormat(DateTimeUtils.JSON_DATEONLY_FORMAT).format(timestamp) : null;
     }
+
+    public static String formatTimestampToDateString(final Timestamp timestamp) {
+        LocalDate date = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return date.format(DateTimeFormatter.ofPattern("d'th' MMM EEEE"));
+    }
+
 }

@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumCompOffUsageStatus {
 
     AVAILABLE("AVAILABLE"), USED("USED"), EXPIRED("EXPIRED"), REQUESTED("REQUESTED"),INVALID("INVALID");
@@ -8,10 +11,6 @@ public enum EnumCompOffUsageStatus {
 
     EnumCompOffUsageStatus(String compOffUsageStatus) {
         this.compOffUsageStatus = compOffUsageStatus;
-    }
-
-    public String getCompOffUsageStatus() {
-        return compOffUsageStatus;
     }
 
     public static EnumCompOffUsageStatus compOffUsageStatusValue(String value) {

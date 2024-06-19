@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Component
 public class CompOffMapper {
@@ -23,11 +24,13 @@ public class CompOffMapper {
 
         compOffTransaction.setEmployeeId(employeeDetails.getId());
         compOffTransaction.setRequestedDt(Timestamp.valueOf(compOffApplyRequest.getRequestedDate()));
+        LocalDateTime requestedDate = compOffTransaction.getRequestedDt().toLocalDateTime();
+        compOffTransaction.setExpiryDate(Timestamp.valueOf(requestedDate.plusDays(90)));
         compOffTransaction.setApproverId(employeeDetails.getApproverId().getId());
         compOffTransaction.setPunchInTime(Time.valueOf(compOffApplyRequest.getPunchIn()));
         compOffTransaction.setPunchOutTime(Time.valueOf(compOffApplyRequest.getPunchOut()));
         compOffTransaction.setWorkHours(Double.valueOf(compOffApplyRequest.getWorkHours()));
-        compOffTransaction.setCancellationReason(compOffApplyRequest.getReason());
+        compOffTransaction.setReason(compOffApplyRequest.getReason());
         compOffTransaction.setApproverRemarks(compOffApplyRequest.getReason());
         compOffTransaction.setRequestedFor(EnumCompOffPeriod.valueOf(compOffApplyRequest.getRequestedFor()));
         compOffTransaction.setApprovedFor(EnumCompOffPeriod.valueOf(compOffApplyRequest.getRequestedFor()));

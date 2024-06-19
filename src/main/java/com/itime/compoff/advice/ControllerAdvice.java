@@ -2,6 +2,7 @@ package com.itime.compoff.advice;
 
 import com.itime.compoff.exception.CommonException;
 import com.itime.compoff.exception.DataNotFoundException;
+import com.itime.compoff.utils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +29,7 @@ public class ControllerAdvice {
     @ExceptionHandler(DataNotFoundException.class)
     public Map<String, String> notFoundException(DataNotFoundException error) {
         Map<String, String> errObj = new HashMap<>();
-        errObj.put("ERROR", error.getMessage());
+        errObj.put(AppConstants.ERROR, error.getMessage());
         return errObj;
     }
 
@@ -37,7 +38,7 @@ public class ControllerAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     public Map<String, String> illegalArgumentException(IllegalArgumentException error) {
         Map<String, String> errObj = new HashMap<>();
-        errObj.put("ERROR", error.getMessage());
+        errObj.put(AppConstants.ERROR, error.getMessage());
         return errObj;
     }
 
@@ -45,7 +46,7 @@ public class ControllerAdvice {
     @ExceptionHandler(CommonException.class)
     public Map<String, String> commonException(CommonException error) {
         Map<String, String> errObj = new HashMap<>();
-        errObj.put("ERROR", error.getMessage());
+        errObj.put(AppConstants.ERROR, error.getMessage());
         return errObj;
     }
 

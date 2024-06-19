@@ -52,7 +52,7 @@ public class LeaveMapper {
     }
     public LeaveTransaction leaveModelToLeaveEntity(LeaveApplyRequest applyLeaverequest, EmployeeDetail employeeDetail, LeaveType leaveType) {
         LeaveTransaction leaveTransaction = new LeaveTransaction();
-        leaveType.setId(Long.valueOf(applyLeaverequest.getLeaveTypeId()));
+        leaveType.setId(Long.parseLong(applyLeaverequest.getLeaveTypeId()));
 
         leaveTransaction.setEmployeeId(employeeDetail.getId());
         leaveTransaction.setLeaveTypeId(leaveType);
@@ -79,5 +79,25 @@ public class LeaveMapper {
         leaveTransaction.setLastUpdatedBy(employeeDetail.getFirstName());
 
         return leaveTransaction;
+    }
+
+    public LeaveSummary mapLeaveSummaryEntity(LeaveTransaction leaveTransaction, Double availableLeaves,
+                                              Double leaveTaken, Long summaryId, Double leaveOpen, Double leaveCredit) {
+
+        LeaveSummary leaveSummary = new LeaveSummary();
+
+        if (summaryId != null) {
+            leaveSummary.setId(summaryId);
+        }
+        leaveSummary.setLeavesAvailable(availableLeaves);
+        leaveSummary.setLeavesTaken(leaveTaken);
+        leaveSummary.setEmployeeId(leaveTransaction.getEmployeeId());
+        leaveSummary.setLeaveTypeId(leaveTransaction.getLeaveTypeId());
+        leaveSummary.setPeriodStartDt(DateTimeUtils.getFirstDayOfYear());
+        leaveSummary.setPeriodEndDt(DateTimeUtils.getLastDayOfYear());
+        leaveSummary.setLeaveOpen(leaveOpen);
+        leaveSummary.setLeaveCredit(leaveCredit);
+
+        return leaveSummary;
     }
 }

@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumLeaveStatus {
 
 
@@ -11,11 +14,7 @@ public enum EnumLeaveStatus {
 		this.leaveStatus = leaveStatus;
 	}
 
-	public String getLeaveStatus() {
-		return leaveStatus;
-	}
-	
-	public static EnumLeaveStatus leaveStatusValue(String value) {
+    public static EnumLeaveStatus leaveStatusValue(String value) {
 		for (EnumLeaveStatus e : values()) {
 			if (e.leaveStatus.equals(value)) {
 				return e;

@@ -34,21 +34,27 @@ public class CompOffTransactionController {
     CompOffTransactionService compOffTransactionService;
 
     @Operation(tags = "CompOff", summary = "Apply Request for CompOff")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+
     @PostMapping(value = "/apply", consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpStatus saveCompOffTransaction(@Valid @RequestBody CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
-        log.info("CompOff request created....");
+        log.info("Processing CompOff request....");
         return compOffTransactionService.createCompOffTransaction(compOffApplyRequest);
 
     }
 
     @Operation(tags = "CompOff", summary = "Approve/Reject CompOff request")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
+
     @GetMapping(value = "/approval", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateCompOffApproval(@RequestParam(name = "transactionId", required = true) String transactionId,
                                                         @RequestParam(name = "transactionStatus", required = true) String transactionStatus,

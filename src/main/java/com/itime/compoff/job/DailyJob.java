@@ -3,7 +3,9 @@ package com.itime.compoff.job;
 import com.itime.compoff.enumeration.EnumTrueFalse;
 import com.itime.compoff.primary.entity.CompOffTransaction;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
+import com.itime.compoff.secondary.repository.EmployeeDetailRepo;
 import com.itime.compoff.utils.AppConstants;
+import com.itime.compoff.utils.DateTimeUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -16,8 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -43,12 +44,12 @@ public class DailyJob {
 
     //Comp-Off Expiry Cron Run daily at midnight
     public void checkForExpiringCompOffs() {
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        LocalDate fiveDaysLater = today.plusDays(5);
-        Timestamp todayTimestamp = Timestamp.valueOf(today.atStartOfDay());
-        Timestamp fiveDaysLaterTimestamp = Timestamp.valueOf(fiveDaysLater.atStartOfDay());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime fiveDaysLater = now.plusDays(5);
 
-        List<CompOffTransaction> expiringCompOffs = compOffTransactionRepo.findExpiringCompOffs(todayTimestamp, fiveDaysLaterTimestamp);
+        List<CompOffTransaction> expiringCompOffs = compOffTransactionRepo.findAllByExpiryDateBetween(
+                Timestamp.valueOf(fiveDaysLater.toLocalDate().atStartOfDay()),
+                Timestamp.valueOf(fiveDaysLater.toLocalDate().plusDays(1).atStartOfDay()));
 
         expiringCompOffs.forEach(this::sendExpiryNotification);
     }
@@ -61,13 +62,13 @@ public class DailyJob {
                 + "\n\nPlease take necessary action.";
 
         String htmlContent = String.format(AppConstants.COMPOFF_EXPIRY_NOTIFICATION_EMAIL_TEMPLATE,
-                compOff.getRequestedDt(),
+                DateTimeUtils.formatTimestampToDateString(compOff.getRequestedDt()),
                 compOff.getWorkHours(),
                 compOff.getReason()
         );
 
         try {
-            sendEmail("0412.aakash@gmail.com", subject, text, htmlContent);
+            sendEmail(AppConstants.EMAIL, subject, text, htmlContent);
         } catch (MessagingException e) {
             log.info(e.toString());
         }

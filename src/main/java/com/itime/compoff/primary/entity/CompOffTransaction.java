@@ -29,6 +29,9 @@ public class CompOffTransaction {
     @Column(name = "requested_date", nullable = false)
     private Timestamp requestedDt;
 
+    @Column(name = "expiry_date", nullable = false)
+    private Timestamp expiryDate;
+
     @Column(name = "punch_in_time", nullable = false)
     private Time punchInTime;
 

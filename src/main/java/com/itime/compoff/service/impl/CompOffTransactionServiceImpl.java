@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 @Component
 public class CompOffTransactionServiceImpl implements CompOffTransactionService {
 
@@ -41,16 +43,20 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
     @Transactional(rollbackOn = CommonException.class)
     public HttpStatus createCompOffTransaction(CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
-
+        log.info("Processing create comp-off request...");
         EmployeeDetail employee = businessValidationService.findEmployeeDetail(compOffApplyRequest.getEmployeeId());
 
+        Timestamp requestDate = Timestamp.valueOf(compOffApplyRequest.getRequestedDate());
+
         businessValidationService.duplicateCompOffValidation(employee, compOffApplyRequest);
+
+        businessValidationService.validateCompOff(compOffApplyRequest, requestDate);
 
         CompOffTransaction compOffTransaction = compOffMapper.mapApplyRequestToEntity(employee, compOffApplyRequest);
 
         compOffTransactionRepo.save(compOffTransaction);
 
-        return HttpStatus.OK;
+        return HttpStatus.CREATED;
     }
 
     // Compoff Approval/Reject
@@ -75,7 +81,8 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
             compOffTransaction.setLastUpdatedBy(employee.getApproverId().getFirstName());
             if (compOffFor != null) {
                 businessValidationService.validateWorkHours
-                        (null, null, EnumCompOffPeriod.valuesOf(compOffFor), businessValidationService.findTimeDifference(compOffTransaction.getPunchInTime(), compOffTransaction.getPunchOutTime()));
+                        (null, null, EnumCompOffPeriod.valuesOf(compOffFor),
+                                businessValidationService.findTimeDifference(compOffTransaction.getPunchInTime(), compOffTransaction.getPunchOutTime()));
                 compOffTransaction.setApprovedFor(EnumCompOffPeriod.valuesOf(compOffFor.toUpperCase()));
             }
             compOffTransactionRepo.save(compOffTransaction);

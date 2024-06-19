@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumCompOffPeriod {
 
     HALF_DAY("HALF_DAY",  0.5),
@@ -13,14 +16,6 @@ public enum EnumCompOffPeriod {
     EnumCompOffPeriod(String value, double days) {
         this.value = value;
         this.days = days;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public double getDays() {
-        return days;
     }
 
     public static EnumCompOffPeriod valuesOf(String value) {

@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumStatus {
 
 	ACTIVE("ACTIVE",1), INACTIVE("INACTIVE",0);
@@ -12,15 +15,7 @@ public enum EnumStatus {
 		this.binary = binary;
 	}
 
-	public String getValue() {
-		return value;
-	}
-	
-	public int getBinary() {
-		return binary;
-	}
-
-	public static EnumStatus valueOfStatus(String value) {
+    public static EnumStatus valueOfStatus(String value) {
 		for (EnumStatus e : values()) {
 			if (e.value.equalsIgnoreCase(value)) {
 				return e;

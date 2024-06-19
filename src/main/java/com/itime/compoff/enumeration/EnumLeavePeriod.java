@@ -1,5 +1,8 @@
 package com.itime.compoff.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum EnumLeavePeriod {
 
 	HALF_DAY("HALF_DAY","Half day"),
@@ -13,15 +16,7 @@ public enum EnumLeavePeriod {
 		this.descripition=descripition;
 	}
 
-	public String getPeriod() {
-		return period;
-	}
-
-	public String getDescripition() {
-		return descripition;
-	}
-
-	public static EnumLeavePeriod valueOfPeriod(String value) {
+    public static EnumLeavePeriod valueOfPeriod(String value) {
 		for (EnumLeavePeriod e : values()) {
 			if (e.period.equals(value)) {
 				return e;

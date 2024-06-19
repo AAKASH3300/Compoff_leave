@@ -11,6 +11,7 @@ import com.itime.compoff.exception.ErrorMessages;
 import com.itime.compoff.model.CompOffApplyRequest;
 import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.primary.entity.CompOffTransaction;
+import com.itime.compoff.primary.entity.LeaveSummary;
 import com.itime.compoff.primary.entity.LeaveTransaction;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveTransactionRepo;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -47,28 +49,37 @@ public class BusinessValidationService {
 
     public EmployeeDetail findEmployeeDetail(long id) throws DataNotFoundException {
 
-        log.trace("Finding Employee Detail");
+        log.trace("Finding Employee Detail......");
         return employeeDetailRepo.findByIdAndEmpStatus(id, EnumStatus.ACTIVE.getBinary())
                 .orElseThrow(() -> new DataNotFoundException("Employee not found"));
     }
 
     public void duplicateCompOffValidation(EmployeeDetail employeeDetails, CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
-        log.trace("Validating Compoff Duplication");
+        log.trace("Validating Duplicate Compoff......");
         Optional<CompOffTransaction> compOffTransaction = compOffTransactionRepo.findTopByEmployeeIdAndRequestedDtAndTransactionStatusIn(employeeDetails.getId(), Timestamp.valueOf(compOffApplyRequest.getRequestedDate()), List.of(EnumCompOffTransactionStatus.PENDING, EnumCompOffTransactionStatus.APPROVED));
         if (compOffTransaction.isPresent()) {
             throw new DataNotFoundException(ErrorMessages.ALREADY_REQUEST_RAISED);
         }
     }
 
+    public void validateCompOff(CompOffApplyRequest compOffApplyRequest, Timestamp requestDate) throws CommonException {
+
+        if (requestDate.toLocalDateTime().toLocalDate().isAfter(LocalDate.now())) {
+            throw new CommonException(ErrorMessages.INVALID_COMPOFF_REQUEST_DATE);
+        }
+        this.validateWorkHours(compOffApplyRequest.getPunchIn(), compOffApplyRequest.getPunchOut(),
+                EnumCompOffPeriod.valuesOf(compOffApplyRequest.getRequestedFor()), null);
+    }
+
     public void validateWorkHours(String punchIn, String punchOut, EnumCompOffPeriod compOffPeriod, Long actualWorkHour) throws CommonException {
 
-        log.trace("Validating Work Hours");
+        log.trace("Validating Work Hours.....");
         AtomicInteger minWorkHour = new AtomicInteger(AppConstants.MIN_WORK_HOUR_COMPOFF);
         AtomicInteger fullDayCompOff = new AtomicInteger(AppConstants.MIN_WORK_HOUR_FULL_DAY_COMPOFF);
 
         long requiredMinWorkHours = DateTimeUtils.findMillisecondsFromHourAndMinute(minWorkHour.get(), 0);
-        long actualMilliSeconds = actualWorkHour != null ? actualWorkHour : this.findTimeDifference(Time.valueOf(punchIn.concat(AppConstants.TIME_CONCAT)), Time.valueOf(punchOut.concat(AppConstants.TIME_CONCAT)));
+        long actualMilliSeconds = actualWorkHour != null ? actualWorkHour : this.findTimeDifference(Time.valueOf(punchIn), Time.valueOf(punchOut));
         if (actualMilliSeconds < requiredMinWorkHours) {
             throw new CommonException(String.format(ErrorMessages.WORK_HOUR_NOT_ENOUGH_COMPOFF, minWorkHour.get()));
         }
@@ -79,6 +90,7 @@ public class BusinessValidationService {
 
     public Long findTimeDifference(Time fromTime, Time toTime) {
 
+        log.trace("Finding time difference......");
         LocalDateTime fromDate = DateTimeUtils.convertTimeToLocalDateTime(fromTime);
         LocalDateTime toDate = DateTimeUtils.convertTimeToLocalDateTime(toTime);
         if (fromDate.isAfter(toDate)) {
@@ -89,13 +101,22 @@ public class BusinessValidationService {
 
     public void duplicateLeaveCheck(EmployeeDetail employee, LeaveApplyRequest leaveRequest) throws DataNotFoundException {
 
-        log.trace("Validating Leave Duplication");
+        log.trace("Validating Leave Duplication.......");
         Optional<LeaveTransaction> listLeaveTransaction = leaveTransactionRepo.findTopByEmployeeIdAndStartDtAndEndDtAndLeaveStatusIn(employee.getId(), Timestamp.valueOf(leaveRequest.getStartDt()), Timestamp.valueOf(leaveRequest.getEndDt()), List.of(EnumLeaveStatus.PENDING, EnumLeaveStatus.APPROVED));
 
         if (listLeaveTransaction.isPresent()) {
             throw new DataNotFoundException(ErrorMessages.ALREADY_REQUEST_RAISED);
         }
 
+    }
+
+    public boolean validateAvailableLeave(Optional<LeaveSummary> leaveSummary, Double numberOfDays) throws CommonException {
+
+        log.trace("Checking leave available");
+        if (leaveSummary.isPresent() && leaveSummary.get().getLeavesAvailable() < numberOfDays) {
+            throw new CommonException(AppConstants.LEAVE_UNAVAILABLE);
+        }
+        return true;
     }
 
 }
