@@ -3,7 +3,6 @@ package com.itime.compoff.job;
 import com.itime.compoff.enumeration.EnumTrueFalse;
 import com.itime.compoff.primary.entity.CompOffTransaction;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
-import com.itime.compoff.secondary.repository.EmployeeDetailRepo;
 import com.itime.compoff.utils.AppConstants;
 import com.itime.compoff.utils.DateTimeUtils;
 import jakarta.mail.MessagingException;

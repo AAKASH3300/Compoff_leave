@@ -56,8 +56,8 @@ public class CompOffTransactionController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
 
     @GetMapping(value = "/approval", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateCompOffApproval(@RequestParam(name = "transactionId", required = true) String transactionId,
-                                                        @RequestParam(name = "transactionStatus", required = true) String transactionStatus,
+    public ResponseEntity<String> updateCompOffApproval(@RequestParam(name = "transactionId") String transactionId,
+                                                        @RequestParam(name = "transactionStatus") String transactionStatus,
                                                         @RequestParam(name = "compOffFor", required = false) String compOffFor,
                                                         @RequestParam(name = "comment", required = false) String comment) throws CommonException {
 

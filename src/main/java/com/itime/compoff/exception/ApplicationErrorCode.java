@@ -9,7 +9,7 @@ public enum ApplicationErrorCode {
 
     ALREADY_COMP_OFF_UPDATED(new ApplicationError("The compOff was already %s")),
 
-    INVALID_REQUEST(new ApplicationError("Invalid Leave status : %s"));
+    INVALID_REQUEST(new ApplicationError("Reporting Manager does not match."));
 
     private final ApplicationError error;
 

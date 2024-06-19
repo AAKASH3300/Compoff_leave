@@ -13,6 +13,7 @@ import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.primary.entity.CompOffTransaction;
 import com.itime.compoff.primary.entity.LeaveSummary;
 import com.itime.compoff.primary.entity.LeaveTransaction;
+import com.itime.compoff.primary.entity.LeaveType;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveTransactionRepo;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
@@ -29,7 +30,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,6 +49,7 @@ public class BusinessValidationService {
 
     @Autowired
     LeaveTransactionRepo leaveTransactionRepo;
+
 
     public EmployeeDetail findEmployeeDetail(long id) throws DataNotFoundException {
 
@@ -110,13 +114,20 @@ public class BusinessValidationService {
 
     }
 
-    public boolean validateAvailableLeave(Optional<LeaveSummary> leaveSummary, Double numberOfDays) throws CommonException {
+    public void validateAvailableLeave(Optional<LeaveSummary> leaveSummary, Double numberOfDays) throws CommonException {
 
         log.trace("Checking leave available");
         if (leaveSummary.isPresent() && leaveSummary.get().getLeavesAvailable() < numberOfDays) {
             throw new CommonException(AppConstants.LEAVE_UNAVAILABLE);
         }
-        return true;
+    }
+
+    public void validateCompOffLeave(LeaveType leaveType, LeaveApplyRequest applyLeaveRequest) throws CommonException {
+        String compOffLeaveCode = AppConstants.DEFAULT_COMP_OFF_LEAVE_CODE;
+        if (compOffLeaveCode.equals(leaveType.getCode()) &&
+                Objects.requireNonNull(DateTimeUtils.convertFromJsonDateOnly(applyLeaveRequest.getStartDt())).before(new Date())) {
+            throw new CommonException(ErrorMessages.INVALID_COMPOFF_TIME_RANGE);
+        }
     }
 
 }

@@ -53,10 +53,10 @@ public class LeaveTransactionController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDescription.class)))})
 
     @GetMapping(value = "/approval", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateLeaveStatus(@RequestParam(name = "transactionId", required = true) String transactionId,
-                                                    @RequestParam(name = "transactionStatus", required = true) String transactionStatus,
+    public ResponseEntity<String> updateLeaveStatus(@RequestParam(name = "transactionId") String transactionId,
+                                                    @RequestParam(name = "transactionStatus") String transactionStatus,
                                                     @RequestParam(name = "employeeId", required = false) String employeeId,
-                                                    @RequestParam(name = "comment", required = true) String comment) throws CommonException {
+                                                    @RequestParam(name = "comment") String comment) throws CommonException {
 
 
         log.trace("Updating Leave Status....");

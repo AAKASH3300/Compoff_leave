@@ -88,7 +88,7 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
             compOffTransactionRepo.save(compOffTransaction);
         } else {
             throw ApplicationErrorCode.ALREADY_COMP_OFF_UPDATED.getError().reqValidationError(
-                    compOffTransaction.getTransactionStatus().getCompOffStatus().toLowerCase(), HttpStatus.BAD_REQUEST.value());
+                    compOffTransaction.getTransactionStatus().getCompOffStatus().toLowerCase());
         }
 
     }

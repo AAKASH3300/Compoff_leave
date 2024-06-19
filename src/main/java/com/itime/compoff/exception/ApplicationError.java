@@ -9,20 +9,20 @@ public class ApplicationError {
         this.description = description;
     }
 
-    public ValidationException reqValidationError(String data, Integer code) {
+    public ValidationException reqValidationError(String data) {
         String desc = String.format(description, data);
-        return new ValidationException(desc, code);
+        return new ValidationException(desc);
     }
 
-    public ValidationException reqValidationError(Integer code) {
-        return new ValidationException(description, code);
+    public ValidationException reqValidationError() {
+        return new ValidationException(description);
     }
 
-    public CommonException commonApplicationError(Integer code) {
+    public CommonException commonApplicationError() {
         return new CommonException(description);
     }
 
-    public CommonException commonApplicationError(String data, Integer code) {
+    public CommonException commonApplicationError(String data) {
         String desc = String.format(description, data);
         return new CommonException(desc);
     }

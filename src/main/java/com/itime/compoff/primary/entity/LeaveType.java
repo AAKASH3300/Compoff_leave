@@ -34,7 +34,7 @@ public class LeaveType implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "leaves_allowed", nullable = true)
+    @Column(name = "leaves_allowed")
     private Double leavesAllowed;
 
     @Enumerated(EnumType.STRING)
@@ -56,13 +56,5 @@ public class LeaveType implements Serializable {
 
     @Column(name = "last_updated_by", nullable = false)
     private String lastUpdatedBy;
-
-    public LeaveType() {
-    }
-
-    public LeaveType(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
 }

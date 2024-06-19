@@ -50,26 +50,26 @@ public class LeaveMapper {
         return leaveSummary;
 
     }
-    public LeaveTransaction leaveModelToLeaveEntity(LeaveApplyRequest applyLeaverequest, EmployeeDetail employeeDetail, LeaveType leaveType) {
+    public LeaveTransaction leaveModelToLeaveEntity(LeaveApplyRequest applyLeaveRequest, EmployeeDetail employeeDetail, LeaveType leaveType) {
         LeaveTransaction leaveTransaction = new LeaveTransaction();
-        leaveType.setId(Long.parseLong(applyLeaverequest.getLeaveTypeId()));
+        leaveType.setId(Long.parseLong(applyLeaveRequest.getLeaveTypeId()));
 
         leaveTransaction.setEmployeeId(employeeDetail.getId());
         leaveTransaction.setLeaveTypeId(leaveType);
-        leaveTransaction.setStartDt(Timestamp.valueOf(applyLeaverequest.getStartDt()));
+        leaveTransaction.setStartDt(Timestamp.valueOf(applyLeaveRequest.getStartDt()));
 
-        leaveTransaction.setEndDt(applyLeaverequest.getEndDt() != null
-                ? Timestamp.valueOf(applyLeaverequest.getEndDt())
-                : Timestamp.valueOf(applyLeaverequest.getStartDt()));
+        leaveTransaction.setEndDt(applyLeaveRequest.getEndDt() != null
+                ? Timestamp.valueOf(applyLeaveRequest.getEndDt())
+                : Timestamp.valueOf(applyLeaveRequest.getStartDt()));
 
-        leaveTransaction.setLeaveForEndDt(applyLeaverequest.getLeaveForEndDt() != null
-                ? EnumLeavePeriod.valueOfPeriod(applyLeaverequest.getLeaveForEndDt())
-                : EnumLeavePeriod.valueOfPeriod(applyLeaverequest.getLeaveForStartDt()));
+        leaveTransaction.setLeaveForEndDt(applyLeaveRequest.getLeaveForEndDt() != null
+                ? EnumLeavePeriod.valueOfPeriod(applyLeaveRequest.getLeaveForEndDt())
+                : EnumLeavePeriod.valueOfPeriod(applyLeaveRequest.getLeaveForStartDt()));
 
-        leaveTransaction.setNoOfDays(Double.valueOf(applyLeaverequest.getNoOfDays()));
+        leaveTransaction.setNoOfDays(Double.valueOf(applyLeaveRequest.getNoOfDays()));
         leaveTransaction.setLeaveStatus(EnumLeaveStatus.PENDING);
-        leaveTransaction.setReason(applyLeaverequest.getReason());
-        leaveTransaction.setLeaveForStartDt(EnumLeavePeriod.valueOfPeriod(applyLeaverequest.getLeaveForStartDt()));
+        leaveTransaction.setReason(applyLeaveRequest.getReason());
+        leaveTransaction.setLeaveForStartDt(EnumLeavePeriod.valueOfPeriod(applyLeaveRequest.getLeaveForStartDt()));
         leaveTransaction.setReportingManager(employeeDetail.getApproverId().getId());
 
         leaveTransaction.setStatus(EnumStatus.ACTIVE);

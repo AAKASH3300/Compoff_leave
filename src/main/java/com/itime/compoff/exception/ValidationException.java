@@ -5,7 +5,7 @@ public class ValidationException extends CommonException{
 
 	private static final long serialVersionUID = -3949136580323575600L;
 
-	public ValidationException(String message, Integer code) {
+	public ValidationException(String message) {
 		super(message);
 	}
 }

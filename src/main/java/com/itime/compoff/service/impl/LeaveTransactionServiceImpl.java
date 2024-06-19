@@ -21,7 +21,6 @@ import com.itime.compoff.validation.BusinessValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -54,6 +53,8 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
         LeaveType leaveType = this.getLeaveType(Long.valueOf(applyLeaveRequest.getLeaveTypeId()));
 
         businessValidationService.duplicateLeaveCheck(employee, applyLeaveRequest);
+
+        businessValidationService.validateCompOffLeave(leaveType, applyLeaveRequest);
 
         LeaveTransaction transactionResponse = leaveMapper.leaveModelToLeaveEntity(applyLeaveRequest, employee, leaveType);
         LeaveTransaction leaveTransaction = leaveTransactionRepo.save(transactionResponse);
@@ -115,7 +116,7 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
             }
         } else {
             throw ApplicationErrorCode.INVALID_REQUEST.getError()
-                    .commonApplicationError(HttpStatus.BAD_REQUEST.value());
+                    .commonApplicationError();
         }
     }
 

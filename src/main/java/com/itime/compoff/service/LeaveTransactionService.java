@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface LeaveTransactionService {
 
-    public LeaveResponse saveLeave(LeaveApplyRequest applyLeaveRequest, String createdByEmpId) throws CommonException;
+     LeaveResponse saveLeave(LeaveApplyRequest applyLeaveRequest, String createdByEmpId) throws CommonException;
 
-    public void updateLeaveTransaction(String transactionId, String status, String employeeId, String comment) throws CommonException;
+     void updateLeaveTransaction(String transactionId, String status, String employeeId, String comment) throws CommonException;
 }

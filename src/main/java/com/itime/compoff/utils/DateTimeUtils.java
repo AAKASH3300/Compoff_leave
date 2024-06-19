@@ -1,27 +1,32 @@
 package com.itime.compoff.utils;
 
+import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
 public class DateTimeUtils {
 
-    private static final String JSON_DATEONLY_FORMAT = "yyyyMMdd";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DateTimeUtils.class);
 
-    private static LocalDate now = LocalDate.now();
-    private static LocalDate firstDay = now.with(firstDayOfYear());
-    private static LocalDate lastDay = now.with(lastDayOfYear());
+    private static final String JSON_DATE_ONLY_FORMAT = "yyyyMMdd";
+
+    private static final LocalDate now = LocalDate.now();
+    private static final LocalDate firstDay = now.with(firstDayOfYear());
+    private static final LocalDate lastDay = now.with(lastDayOfYear());
 
     DateTimeUtils() {
     }
@@ -49,7 +54,7 @@ public class DateTimeUtils {
     }
 
     public static String convertToJsonTimestampDateOnly(final Timestamp timestamp) {
-        return timestamp != null ? new SimpleDateFormat(DateTimeUtils.JSON_DATEONLY_FORMAT).format(timestamp) : null;
+        return timestamp != null ? new SimpleDateFormat(DateTimeUtils.JSON_DATE_ONLY_FORMAT).format(timestamp) : null;
     }
 
     public static String formatTimestampToDateString(final Timestamp timestamp) {
@@ -57,4 +62,14 @@ public class DateTimeUtils {
         return date.format(DateTimeFormatter.ofPattern("d'th' MMM EEEE"));
     }
 
+    public static Date convertFromJsonDateOnly(final String jsonDate) {
+        try {
+            return StringUtils.isNotBlank(jsonDate)
+                    ? new SimpleDateFormat(DateTimeUtils.JSON_DATE_ONLY_FORMAT).parse(jsonDate)
+                    : null;
+        } catch (final ParseException e) {
+            LOGGER.warn(AppConstants.PARSER_EXCEPTION, e);
+            return null;
+        }
+    }
 }

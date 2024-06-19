@@ -3,8 +3,9 @@ package com.itime.compoff.primary.entity;
 
 import com.itime.compoff.enumeration.EnumInOut;
 import com.itime.compoff.enumeration.EnumStatus;
-import com.itime.compoff.secondary.entity.EmployeeDetail;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,6 +13,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "eib_web_punch_transaction")
+@Getter
+@Setter
 public class WebPunchTransaction implements Serializable {
 
     @Serial
