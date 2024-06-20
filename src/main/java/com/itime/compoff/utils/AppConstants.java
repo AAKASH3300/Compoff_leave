@@ -74,10 +74,11 @@ public class AppConstants {
 
     public static final String LEAVE_STATUS_UPDATED = "Leave Status Updated";
     public static final String ALREADY_LEAVE_REQUEST_APPLIED = "Already Leave applied for this date";
-    public static final String LEAVE_UNAVAILABLE = "Leave Unavailable";
+    public static final String LEAVE_UNAVAILABLE = "Leave Unavailable : Check your leave balance";
     public static final String PARSER_EXCEPTION = "Parse Exception";
     public static final String EMAIL = "aakash.b@aaludra.com";
     public static final String DEFAULT_COMP_OFF_LEAVE_CODE = "COMP_OFF";
+    public static final Long DEFAULT_COMP_OFF_LEAVE_ID = 1L;
 
     private AppConstants() {
     }

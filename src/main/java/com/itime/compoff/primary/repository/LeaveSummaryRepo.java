@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Transactional(propagation = Propagation.REQUIRED)
@@ -16,5 +17,6 @@ public interface LeaveSummaryRepo extends JpaRepository<LeaveSummary, Long>, Jpa
     Optional<LeaveSummary> findByLeaveTypeIdAndEmployeeId(LeaveType leaveType, Long employeeDetail);
 
 
+    Optional<LeaveSummary> findTop1ByEmployeeIdAndLeaveTypeIdAndPeriodStartDtLessThanEqualAndPeriodEndDtGreaterThanEqual(long employeeId, LeaveType leaveType, Timestamp timestamp, Timestamp timestamp1);
 }
 

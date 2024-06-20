@@ -8,7 +8,8 @@ public class ErrorMessages {
     public static final String WORK_HOUR_NOT_ENOUGH_FULLDAY_COMPOFF = "Work hours should not less than %d for full day request.";
     public static final String ALREADY_REQUEST_RAISED = "Already request raised for this date";
     public static final String INVALID_COMPOFF_REQUEST_DATE = "Request Denied,You cannot request comp off on future date.";
-    public static final String INVALID_COMPOFF_TIME_RANGE = "Invalid Compoff time range";
+    public static final String INVALID_COMPOFF_TIME_RANGE = "Invalid Compoff time range leave date is in the past";
+    public static final String UNABLE_TO_CREDIT_COMPOFF = "Unable to credit compoff : Leave Type not available";
 
     protected ErrorMessages() {
     }

@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,7 +62,7 @@ public class BusinessValidationService {
         log.trace("Validating Duplicate Compoff......");
         Optional<CompOffTransaction> compOffTransaction = compOffTransactionRepo.findTopByEmployeeIdAndRequestedDtAndTransactionStatusIn(employeeDetails.getId(), Timestamp.valueOf(compOffApplyRequest.getRequestedDate()), List.of(EnumCompOffTransactionStatus.PENDING, EnumCompOffTransactionStatus.APPROVED));
         if (compOffTransaction.isPresent()) {
-            throw new DataNotFoundException(ErrorMessages.ALREADY_REQUEST_RAISED);
+            throw new CommonException(ErrorMessages.ALREADY_REQUEST_RAISED);
         }
     }
 
@@ -103,13 +102,13 @@ public class BusinessValidationService {
         return ChronoUnit.MILLIS.between(fromDate, toDate);
     }
 
-    public void duplicateLeaveCheck(EmployeeDetail employee, LeaveApplyRequest leaveRequest) throws DataNotFoundException {
+    public void duplicateLeaveCheck(EmployeeDetail employee, LeaveApplyRequest leaveRequest) throws CommonException {
 
         log.trace("Validating Leave Duplication.......");
         Optional<LeaveTransaction> listLeaveTransaction = leaveTransactionRepo.findTopByEmployeeIdAndStartDtAndEndDtAndLeaveStatusIn(employee.getId(), Timestamp.valueOf(leaveRequest.getStartDt()), Timestamp.valueOf(leaveRequest.getEndDt()), List.of(EnumLeaveStatus.PENDING, EnumLeaveStatus.APPROVED));
 
         if (listLeaveTransaction.isPresent()) {
-            throw new DataNotFoundException(ErrorMessages.ALREADY_REQUEST_RAISED);
+            throw new CommonException(ErrorMessages.ALREADY_REQUEST_RAISED);
         }
 
     }
@@ -125,7 +124,7 @@ public class BusinessValidationService {
     public void validateCompOffLeave(LeaveType leaveType, LeaveApplyRequest applyLeaveRequest) throws CommonException {
         String compOffLeaveCode = AppConstants.DEFAULT_COMP_OFF_LEAVE_CODE;
         if (compOffLeaveCode.equals(leaveType.getCode()) &&
-                Objects.requireNonNull(DateTimeUtils.convertFromJsonDateOnly(applyLeaveRequest.getStartDt())).before(new Date())) {
+               Timestamp.valueOf(applyLeaveRequest.getStartDt()).before(new Date())) {
             throw new CommonException(ErrorMessages.INVALID_COMPOFF_TIME_RANGE);
         }
     }

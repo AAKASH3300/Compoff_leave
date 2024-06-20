@@ -29,7 +29,6 @@ public class LeaveApplyRequest {
     private String endDt;
 
     @NotNull(message = "Number of days cannot be null")
-    @Min(value = 1, message = "Number of days must be at least 1")
     @Max(value = 10, message = "Number of days must not exceed 10")
     private String noOfDays;
 

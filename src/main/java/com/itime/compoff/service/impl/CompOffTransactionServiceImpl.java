@@ -11,9 +11,14 @@ import com.itime.compoff.exception.ErrorMessages;
 import com.itime.compoff.mapper.CompOffMapper;
 import com.itime.compoff.model.CompOffApplyRequest;
 import com.itime.compoff.primary.entity.CompOffTransaction;
+import com.itime.compoff.primary.entity.LeaveSummary;
+import com.itime.compoff.primary.entity.LeaveType;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
+import com.itime.compoff.primary.repository.LeaveSummaryRepo;
+import com.itime.compoff.primary.repository.LeaveTypeRepo;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
 import com.itime.compoff.service.CompOffTransactionService;
+import com.itime.compoff.utils.AppConstants;
 import com.itime.compoff.utils.DateTimeUtils;
 import com.itime.compoff.validation.BusinessValidationService;
 import jakarta.transaction.Transactional;
@@ -24,6 +29,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 @Component
 public class CompOffTransactionServiceImpl implements CompOffTransactionService {
@@ -33,7 +40,13 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
     CompOffTransactionRepo compOffTransactionRepo;
 
     @Autowired
+    LeaveSummaryRepo leaveSummaryRepo;
+
+    @Autowired
     CompOffMapper compOffMapper;
+
+    @Autowired
+    LeaveTypeRepo leaveTypeRepo;
 
     @Autowired
     BusinessValidationService businessValidationService;
@@ -86,11 +99,52 @@ public class CompOffTransactionServiceImpl implements CompOffTransactionService 
                 compOffTransaction.setApprovedFor(EnumCompOffPeriod.valuesOf(compOffFor.toUpperCase()));
             }
             compOffTransactionRepo.save(compOffTransaction);
+            if(compOffTransaction.getTransactionStatus().equals(EnumCompOffTransactionStatus.APPROVED)) {
+                this.updateCompOffLeaveSummary(compOffTransaction);
+            }
         } else {
             throw ApplicationErrorCode.ALREADY_COMP_OFF_UPDATED.getError().reqValidationError(
                     compOffTransaction.getTransactionStatus().getCompOffStatus().toLowerCase());
         }
 
+    }
+
+    private void updateCompOffLeaveSummary(CompOffTransaction compOffTransaction) throws CommonException {
+
+        EmployeeDetail employee = businessValidationService.findEmployeeDetail(compOffTransaction.getEmployeeId());
+
+        LeaveSummary leaveSummary = this.findCompOffLeaveSummary(employee.getId());
+        if (leaveSummary != null) {
+            leaveSummary.setLeavesAvailable(leaveSummary.getLeavesAvailable() + (compOffTransaction.getApprovedFor().getDays()));
+        } else {
+            leaveSummary = new LeaveSummary();
+            LeaveType leaveType = this.getLeaveType();
+
+            if (leaveType != null) {
+                leaveSummary.setLeavesAvailable(compOffTransaction.getApprovedFor().getDays());
+                leaveSummary.setLeaveTypeId(leaveType);
+                leaveSummary.setEmployeeId(compOffTransaction.getEmployeeId());
+                leaveSummary.setLeaveOpen(0.0);
+                leaveSummary.setLeavesTaken(0.0);
+                leaveSummary.setLeaveCredit(0.0);
+                leaveSummary.setPeriodStartDt(DateTimeUtils.getFirstDayOfYear());
+                leaveSummary.setPeriodEndDt(DateTimeUtils.getLastDayOfYear());
+            } else {
+                throw new CommonException(ErrorMessages.UNABLE_TO_CREDIT_COMPOFF);
+            }
+        }
+        leaveSummaryRepo.save(leaveSummary);
+    }
+
+    private LeaveSummary findCompOffLeaveSummary(long employeeId) throws CommonException {
+        return leaveSummaryRepo.findTop1ByEmployeeIdAndLeaveTypeIdAndPeriodStartDtLessThanEqualAndPeriodEndDtGreaterThanEqual(
+                employeeId, this.getLeaveType(), new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()),
+                new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())).orElse(null);
+    }
+
+    private LeaveType getLeaveType() throws CommonException {
+        return leaveTypeRepo.findByIdAndStatus(AppConstants.DEFAULT_COMP_OFF_LEAVE_ID, EnumStatus.ACTIVE).orElseThrow(
+                () -> new DataNotFoundException(AppConstants.LEAVE_TYPE_NOT_FOUND));
     }
 
 }
