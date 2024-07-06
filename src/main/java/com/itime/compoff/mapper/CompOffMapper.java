@@ -23,8 +23,8 @@ public class CompOffMapper {
         CompOffTransaction compOffTransaction = new CompOffTransaction();
 
         compOffTransaction.setEmployeeId(employeeDetails.getId());
-        compOffTransaction.setRequestedDt(Timestamp.valueOf(compOffApplyRequest.getRequestedDate()));
-        LocalDateTime requestedDate = compOffTransaction.getRequestedDt().toLocalDateTime();
+        compOffTransaction.setRequestedDate(Timestamp.valueOf(compOffApplyRequest.getRequestedDate()));
+        LocalDateTime requestedDate = compOffTransaction.getRequestedDate().toLocalDateTime();
         compOffTransaction.setExpiryDate(Timestamp.valueOf(requestedDate.plusDays(90)));
         compOffTransaction.setApproverId(employeeDetails.getApproverId().getId());
         compOffTransaction.setPunchInTime(Time.valueOf(compOffApplyRequest.getPunchIn()));

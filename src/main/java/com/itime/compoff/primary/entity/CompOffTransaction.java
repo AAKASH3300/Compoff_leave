@@ -27,7 +27,7 @@ public class CompOffTransaction {
     private long employeeId;
 
     @Column(name = "requested_date", nullable = false)
-    private Timestamp requestedDt;
+    private Timestamp requestedDate;
 
     @Column(name = "expiry_date", nullable = false)
     private Timestamp expiryDate;

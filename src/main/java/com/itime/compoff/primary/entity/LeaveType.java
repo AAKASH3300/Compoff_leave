@@ -11,9 +11,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "eib_leave_type")
 @Getter
 @Setter
+@Table(name = "eib_leave_type")
 public class LeaveType implements Serializable {
 
 

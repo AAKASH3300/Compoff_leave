@@ -1,14 +1,18 @@
 package com.itime.compoff.service.impl;
 
+import com.itime.compoff.enumeration.EnumCompOffTransactionStatus;
+import com.itime.compoff.enumeration.EnumCompOffUsageStatus;
 import com.itime.compoff.enumeration.EnumLeaveStatus;
 import com.itime.compoff.enumeration.EnumStatus;
 import com.itime.compoff.exception.*;
 import com.itime.compoff.mapper.LeaveMapper;
 import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.model.LeaveResponse;
+import com.itime.compoff.primary.entity.CompOffTransaction;
 import com.itime.compoff.primary.entity.LeaveSummary;
 import com.itime.compoff.primary.entity.LeaveTransaction;
 import com.itime.compoff.primary.entity.LeaveType;
+import com.itime.compoff.primary.repository.CompOffTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveSummaryRepo;
 import com.itime.compoff.primary.repository.LeaveTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveTypeRepo;
@@ -23,6 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -38,6 +45,9 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
 
     @Autowired
     LeaveTransactionRepo leaveTransactionRepo;
+
+    @Autowired
+    CompOffTransactionRepo compOffTransactionRepo;
 
     @Autowired
     LeaveSummaryRepo leaveSummaryRepo;
@@ -60,9 +70,10 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
         LeaveTransaction leaveTransaction = leaveTransactionRepo.save(transactionResponse);
 
         this.buildLeaveSummary(leaveType, applyLeaveRequest);
-
+        this.updateCompoffTransaction(leaveTransaction);
         return leaveMapper.leaveEntityToModel(leaveTransaction);
     }
+
 
     private LeaveType getLeaveType(Long leaveTypeId) throws CommonException {
         return leaveTypeRepo.findByIdAndStatus(leaveTypeId, EnumStatus.ACTIVE).orElseThrow(
@@ -110,6 +121,7 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
                 leaveTransaction.setLastUpdatedDt(DateTimeUtils.getCurrentTimeStamp());
                 leaveTransactionRepo.save(leaveTransaction);
                 this.updateLeaveSummary(leaveTransaction);
+                this.updateCompoffTransaction(leaveTransaction);
             } else {
                 throw new StatusException(
                         ResourcesUtils.stringFormater(AppConstants.ALREADY_LEAVE_REQUEST_APPLIED, String.valueOf(leaveTransaction.getLeaveStatus()).toLowerCase()));
@@ -117,6 +129,41 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
         } else {
             throw ApplicationErrorCode.INVALID_REQUEST.getError()
                     .commonApplicationError();
+        }
+    }
+
+    private void updateCompoffTransaction(LeaveTransaction leaveTransaction) throws DataNotFoundException {
+        double noOfDays = leaveTransaction.getNoOfDays();
+
+        EmployeeDetail employeeDetail = businessValidationService.findEmployeeDetail(leaveTransaction.getEmployeeId());
+
+        List<CompOffTransaction> compOffTransactions = this.getEmployeeCompOffTransactions(employeeDetail,
+                LocalDate.now().minusDays(90), LocalDate.now().plusDays(1), null);
+
+        List<CompOffTransaction> updatedCompOffTransactions = new ArrayList<>();
+        for (CompOffTransaction compOff : compOffTransactions) {
+            if (compOff.getApprovedFor().getDays() >= noOfDays) {
+                compOff.setCompOffUsageStatus(EnumCompOffUsageStatus.USED);
+                compOff.setLeaveTransaction(leaveTransaction);
+                compOff.setLastUpdatedBy(leaveTransaction.getLastUpdatedBy());
+                compOff.setLastUpdatedDt(DateTimeUtils.getCurrentTimeStamp());
+                updatedCompOffTransactions.add(compOff);
+                noOfDays -= compOff.getApprovedFor().getDays();
+            }
+            if (!updatedCompOffTransactions.isEmpty()) {
+                compOffTransactionRepo.saveAll(updatedCompOffTransactions);
+            }
+        }
+    }
+
+    private List<CompOffTransaction> getEmployeeCompOffTransactions(EmployeeDetail employeeId, LocalDate startDate, LocalDate endDate, LeaveTransaction leaveTransaction) {
+        if (leaveTransaction == null) {
+            return compOffTransactionRepo.findAllByEmployeeIdAndRequestedDateBetweenAndTransactionStatusAndCompOffUsageStatusInAndStatusOrderByRequestedDateAsc
+                    (employeeId.getId(), DateTimeUtils.convertLocalDateToTimestamp(startDate), DateTimeUtils.convertLocalDateToTimestamp(endDate), EnumCompOffTransactionStatus.APPROVED, List.of(EnumCompOffUsageStatus.AVAILABLE), EnumStatus.ACTIVE);
+        } else {
+            return compOffTransactionRepo.findAllByEmployeeIdAndTransactionStatusAndCompOffUsageStatusInAndStatusAndLeaveTransactionOrderByRequestedDateAsc
+                    (employeeId.getId(), EnumCompOffTransactionStatus.APPROVED, List.of(EnumCompOffUsageStatus.USED), EnumStatus.ACTIVE,
+                            leaveTransaction);
         }
     }
 

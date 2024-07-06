@@ -62,14 +62,9 @@ public class DateTimeUtils {
         return date.format(DateTimeFormatter.ofPattern("d'th' MMM EEEE"));
     }
 
-    public static Date convertFromJsonDateOnly(final String jsonDate) {
-        try {
-            return StringUtils.isNotBlank(jsonDate)
-                    ? new SimpleDateFormat(DateTimeUtils.JSON_DATE_ONLY_FORMAT).parse(jsonDate)
-                    : null;
-        } catch (final ParseException e) {
-            LOGGER.warn(AppConstants.PARSER_EXCEPTION, e);
-            return null;
-        }
+    public static Timestamp convertLocalDateToTimestamp(LocalDate date) {
+        return Timestamp.valueOf(date.atStartOfDay());
     }
+
+
 }

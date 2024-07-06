@@ -56,12 +56,12 @@ public class DailyJob {
     private void sendExpiryNotification(CompOffTransaction compOff) {
 
         String subject = "CompOff Expiry Notification";
-        String text = "Dear Employee,\n\nThis is a notification that your compensatory off requested on " + compOff.getRequestedDt()
+        String text = "Dear Employee,\n\nThis is a notification that your compensatory off requested on " + compOff.getRequestedDate()
                 + " is expiring soon.\n\nWork hours: " + compOff.getWorkHours() + "\nReason: " + compOff.getReason()
                 + "\n\nPlease take necessary action.";
 
         String htmlContent = String.format(AppConstants.COMPOFF_EXPIRY_NOTIFICATION_EMAIL_TEMPLATE,
-                DateTimeUtils.formatTimestampToDateString(compOff.getRequestedDt()),
+                DateTimeUtils.formatTimestampToDateString(compOff.getRequestedDate()),
                 compOff.getWorkHours(),
                 compOff.getReason()
         );

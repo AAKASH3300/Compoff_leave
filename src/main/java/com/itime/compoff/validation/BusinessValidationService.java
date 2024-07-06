@@ -10,10 +10,7 @@ import com.itime.compoff.exception.DataNotFoundException;
 import com.itime.compoff.exception.ErrorMessages;
 import com.itime.compoff.model.CompOffApplyRequest;
 import com.itime.compoff.model.LeaveApplyRequest;
-import com.itime.compoff.primary.entity.CompOffTransaction;
-import com.itime.compoff.primary.entity.LeaveSummary;
-import com.itime.compoff.primary.entity.LeaveTransaction;
-import com.itime.compoff.primary.entity.LeaveType;
+import com.itime.compoff.primary.entity.*;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveTransactionRepo;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
@@ -60,7 +57,7 @@ public class BusinessValidationService {
     public void duplicateCompOffValidation(EmployeeDetail employeeDetails, CompOffApplyRequest compOffApplyRequest) throws CommonException {
 
         log.trace("Validating Duplicate Compoff......");
-        Optional<CompOffTransaction> compOffTransaction = compOffTransactionRepo.findTopByEmployeeIdAndRequestedDtAndTransactionStatusIn(employeeDetails.getId(), Timestamp.valueOf(compOffApplyRequest.getRequestedDate()), List.of(EnumCompOffTransactionStatus.PENDING, EnumCompOffTransactionStatus.APPROVED));
+        Optional<CompOffTransaction> compOffTransaction = compOffTransactionRepo.findTopByEmployeeIdAndRequestedDateAndTransactionStatusIn(employeeDetails.getId(), Timestamp.valueOf(compOffApplyRequest.getRequestedDate()), List.of(EnumCompOffTransactionStatus.PENDING, EnumCompOffTransactionStatus.APPROVED));
         if (compOffTransaction.isPresent()) {
             throw new CommonException(ErrorMessages.ALREADY_REQUEST_RAISED);
         }
@@ -73,7 +70,17 @@ public class BusinessValidationService {
         }
         this.validateWorkHours(compOffApplyRequest.getPunchIn(), compOffApplyRequest.getPunchOut(),
                 EnumCompOffPeriod.valuesOf(compOffApplyRequest.getRequestedFor()), null);
+//        this.validateShift(compOffApplyRequest,requestDate);
     }
+
+//    private void validateShift(CompOffApplyRequest compOffApplyRequest,Timestamp requestDate) {
+//        List<ShiftRoster> shiftRosterList = shiftRosterRepo.
+////        List<Holiday> holidayList = holidayRepo.findAllByDate(requestDate);
+////        if(holidayList!=null){
+////            throw new CommonException(ErrorMessages.)
+////        }
+//
+//    }
 
     public void validateWorkHours(String punchIn, String punchOut, EnumCompOffPeriod compOffPeriod, Long actualWorkHour) throws CommonException {
 
@@ -87,7 +94,7 @@ public class BusinessValidationService {
             throw new CommonException(String.format(ErrorMessages.WORK_HOUR_NOT_ENOUGH_COMPOFF, minWorkHour.get()));
         }
         if (compOffPeriod.equals(EnumCompOffPeriod.FULL_DAY) && (actualMilliSeconds < DateTimeUtils.findMillisecondsFromHourAndMinute(fullDayCompOff.get(), 0))) {
-            throw new CommonException(String.format(ErrorMessages.WORK_HOUR_NOT_ENOUGH_FULLDAY_COMPOFF, fullDayCompOff.get()));
+            throw new CommonException(String.format(ErrorMessages.WORK_HOUR_NOT_ENOUGH_FULL_DAY_COMPOFF, fullDayCompOff.get()));
         }
     }
 

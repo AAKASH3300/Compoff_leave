@@ -8,9 +8,9 @@ import lombok.Setter;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "eib_holidays")
 @Getter
 @Setter
+@Table(name = "eib_holidays")
 public class Holiday {
 
     @Id

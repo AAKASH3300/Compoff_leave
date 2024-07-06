@@ -12,9 +12,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "eib_web_punch_transaction")
 @Getter
 @Setter
+@Table(name = "eib_web_punch_transaction")
 public class WebPunchTransaction implements Serializable {
 
     @Serial
