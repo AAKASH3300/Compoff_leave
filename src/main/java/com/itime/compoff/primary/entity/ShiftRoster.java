@@ -24,16 +24,22 @@ public class ShiftRoster  {
 
     @Column(name = "day_1")
     private Integer day1;
+
     @Column(name = "day_2")
     private Integer day2;
+
     @Column(name = "day_3")
     private Integer day3;
+
     @Column(name = "day_4")
     private Integer day4;
+
     @Column(name = "day_5")
     private Integer day5;
+
     @Column(name = "day_6")
     private Integer day6;
+
     @Column(name = "day_7")
     private Integer day7;
 
@@ -81,20 +87,28 @@ public class ShiftRoster  {
 
     @Column(name = "day_22")
     private Integer day22;
+
     @Column(name = "day_23")
     private Integer day23;
+
     @Column(name = "day_24")
     private Integer day24;
+
     @Column(name = "day_25")
     private Integer day25;
+
     @Column(name = "day_26")
     private Integer day26;
+
     @Column(name = "day_27")
     private Integer day27;
+
     @Column(name = "day_28")
     private Integer day28;
+
     @Column(name = "day_29")
     private Integer day29;
+
     @Column(name = "day_30")
     private Integer day30;
 

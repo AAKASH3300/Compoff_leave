@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ControllerAdvice {
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException exception) {
@@ -32,7 +33,6 @@ public class ControllerAdvice {
         errObj.put(AppConstants.ERROR, error.getMessage());
         return errObj;
     }
-
 
     @ResponseStatus(HttpStatus.FOUND)
     @ExceptionHandler(IllegalArgumentException.class)

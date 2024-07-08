@@ -79,6 +79,7 @@ public class AppConstants {
     public static final String EMAIL = "aakash.b@aaludra.com";
     public static final String DEFAULT_COMP_OFF_LEAVE_CODE = "COMP_OFF";
     public static final Long DEFAULT_COMP_OFF_LEAVE_ID = 1L;
+    public static final String COMPOFF_CANNOT_BE_AVAILED_ON_SHIFT = "Compoff cannot be applied on a shift day";
 
     private AppConstants() {
     }

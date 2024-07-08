@@ -6,7 +6,9 @@ import lombok.Getter;
 public enum EnumLeavePeriod {
 
 	HALF_DAY("HALF_DAY","Half day"),
-	FULL_DAY("FULL_DAY","Full day");
+	FULL_DAY("FULL_DAY","Full day"),
+	FIRST_HALF("FIRST_HALF","First half"),
+	SECOND_HALF("SECOND_HALF","Second half");;
 
 	String period;
 	String descripition;

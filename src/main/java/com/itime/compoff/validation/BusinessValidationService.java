@@ -13,6 +13,7 @@ import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.primary.entity.*;
 import com.itime.compoff.primary.repository.CompOffTransactionRepo;
 import com.itime.compoff.primary.repository.LeaveTransactionRepo;
+import com.itime.compoff.primary.repository.ShiftRosterRepo;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
 import com.itime.compoff.secondary.repository.EmployeeDetailRepo;
 import com.itime.compoff.utils.AppConstants;
@@ -26,6 +27,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +47,9 @@ public class BusinessValidationService {
 
     @Autowired
     LeaveTransactionRepo leaveTransactionRepo;
+
+    @Autowired
+    ShiftRosterRepo shiftRosterRepo;
 
 
     public EmployeeDetail findEmployeeDetail(long id) throws DataNotFoundException {
@@ -70,17 +75,40 @@ public class BusinessValidationService {
         }
         this.validateWorkHours(compOffApplyRequest.getPunchIn(), compOffApplyRequest.getPunchOut(),
                 EnumCompOffPeriod.valuesOf(compOffApplyRequest.getRequestedFor()), null);
-//        this.validateShift(compOffApplyRequest,requestDate);
+        this.validateShift(compOffApplyRequest, requestDate);
     }
 
-//    private void validateShift(CompOffApplyRequest compOffApplyRequest,Timestamp requestDate) {
-//        List<ShiftRoster> shiftRosterList = shiftRosterRepo.
-////        List<Holiday> holidayList = holidayRepo.findAllByDate(requestDate);
-////        if(holidayList!=null){
-////            throw new CommonException(ErrorMessages.)
-////        }
-//
-//    }
+    private void validateShift(CompOffApplyRequest compOffApplyRequest, Timestamp requestDate) throws CommonException {
+        ShiftRoster shiftRoster = shiftRosterRepo.findByEmployeeId(compOffApplyRequest.getEmployeeId());
+        if (shiftRoster == null) {
+            throw new CommonException("Shift roster not found for employee");
+        }
+        Integer shiftValue = this.getShiftValue(shiftRoster, requestDate);
+        if (shiftValue == 1) {
+            throw new CommonException(AppConstants.COMPOFF_CANNOT_BE_AVAILED_ON_SHIFT);
+        }
+    }
+
+    public Integer getShiftValue(ShiftRoster shiftRoster, Timestamp timestamp) {
+
+        LocalDate localDate = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        int dayOfMonth = localDate.getDayOfMonth();
+
+        Integer[] days = {
+                shiftRoster.getDay1(), shiftRoster.getDay2(), shiftRoster.getDay3(),
+                shiftRoster.getDay4(), shiftRoster.getDay5(), shiftRoster.getDay6(),
+                shiftRoster.getDay7(), shiftRoster.getDay8(), shiftRoster.getDay9(),
+                shiftRoster.getDay10(), shiftRoster.getDay11(), shiftRoster.getDay12(),
+                shiftRoster.getDay13(), shiftRoster.getDay14(), shiftRoster.getDay15(),
+                shiftRoster.getDay16(), shiftRoster.getDay17(), shiftRoster.getDay18(),
+                shiftRoster.getDay19(), shiftRoster.getDay20(), shiftRoster.getDay21(),
+                shiftRoster.getDay22(), shiftRoster.getDay23(), shiftRoster.getDay24(),
+                shiftRoster.getDay25(), shiftRoster.getDay26(), shiftRoster.getDay27(),
+                shiftRoster.getDay28(), shiftRoster.getDay29(), shiftRoster.getDay30(),
+                shiftRoster.getDay31()
+        };
+        return days[dayOfMonth - 1];
+    }
 
     public void validateWorkHours(String punchIn, String punchOut, EnumCompOffPeriod compOffPeriod, Long actualWorkHour) throws CommonException {
 
@@ -131,7 +159,7 @@ public class BusinessValidationService {
     public void validateCompOffLeave(LeaveType leaveType, LeaveApplyRequest applyLeaveRequest) throws CommonException {
         String compOffLeaveCode = AppConstants.DEFAULT_COMP_OFF_LEAVE_CODE;
         if (compOffLeaveCode.equals(leaveType.getCode()) &&
-               Timestamp.valueOf(applyLeaveRequest.getStartDt()).before(new Date())) {
+                Timestamp.valueOf(applyLeaveRequest.getStartDt()).before(new Date())) {
             throw new CommonException(ErrorMessages.INVALID_COMPOFF_TIME_RANGE);
         }
     }

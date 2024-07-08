@@ -10,4 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
 public interface ShiftRosterRepo extends JpaRepository<ShiftRoster, Long>, JpaSpecificationExecutor<ShiftRoster> {
+
+    ShiftRoster findByEmployeeId(Long employeeId);
+
 }
