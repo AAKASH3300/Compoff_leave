@@ -13,4 +13,5 @@ public interface ShiftRosterRepo extends JpaRepository<ShiftRoster, Long>, JpaSp
 
     ShiftRoster findByEmployeeId(Long employeeId);
 
+    ShiftRoster findByEmployeeIdAndMonthGreaterThanEqualAndMonthLessThanEqualAndYearGreaterThanEqualAndYearLessThanEqual(long employeeDetail, int monthValue, int monthValue1, int year, int year1);
 }

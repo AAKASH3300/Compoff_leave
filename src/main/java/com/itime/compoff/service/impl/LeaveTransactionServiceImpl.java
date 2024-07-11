@@ -1,41 +1,31 @@
 package com.itime.compoff.service.impl;
 
-import com.itime.compoff.enumeration.EnumCompOffTransactionStatus;
-import com.itime.compoff.enumeration.EnumCompOffUsageStatus;
-import com.itime.compoff.enumeration.EnumLeaveStatus;
-import com.itime.compoff.enumeration.EnumStatus;
+import com.itime.compoff.enumeration.*;
 import com.itime.compoff.exception.*;
 import com.itime.compoff.mapper.LeaveMapper;
 import com.itime.compoff.model.LeaveApplyRequest;
 import com.itime.compoff.model.LeaveResponse;
-import com.itime.compoff.primary.entity.CompOffTransaction;
-import com.itime.compoff.primary.entity.LeaveSummary;
-import com.itime.compoff.primary.entity.LeaveTransaction;
-import com.itime.compoff.primary.entity.LeaveType;
-import com.itime.compoff.primary.repository.CompOffTransactionRepo;
-import com.itime.compoff.primary.repository.LeaveSummaryRepo;
-import com.itime.compoff.primary.repository.LeaveTransactionRepo;
-import com.itime.compoff.primary.repository.LeaveTypeRepo;
+import com.itime.compoff.primary.entity.*;
+import com.itime.compoff.primary.repository.*;
 import com.itime.compoff.secondary.entity.EmployeeDetail;
 import com.itime.compoff.service.LeaveTransactionService;
 import com.itime.compoff.utils.AppConstants;
 import com.itime.compoff.utils.DateTimeUtils;
 import com.itime.compoff.utils.ResourcesUtils;
 import com.itime.compoff.validation.BusinessValidationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class LeaveTransactionServiceImpl implements LeaveTransactionService {
-
-    private static final Logger log = LoggerFactory.getLogger(LeaveTransactionServiceImpl.class);
 
     @Autowired
     LeaveMapper leaveMapper;
@@ -53,6 +43,9 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
     LeaveSummaryRepo leaveSummaryRepo;
 
     @Autowired
+    ShiftRosterRepo shiftRosterRepo;
+
+    @Autowired
     BusinessValidationService businessValidationService;
 
     @Override
@@ -65,6 +58,8 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
         businessValidationService.duplicateLeaveCheck(employee, applyLeaveRequest);
 
         businessValidationService.validateCompOffLeave(leaveType, applyLeaveRequest);
+
+        this.getNumberOfDays(applyLeaveRequest, employee);
 
         LeaveTransaction transactionResponse = leaveMapper.leaveModelToLeaveEntity(applyLeaveRequest, employee, leaveType);
         LeaveTransaction leaveTransaction = leaveTransactionRepo.save(transactionResponse);
@@ -202,5 +197,42 @@ public class LeaveTransactionServiceImpl implements LeaveTransactionService {
                 .save(leaveMapper.mapLeaveSummaryEntity(leaveTransaction, availableLeaves, leaveTaken, leaveSummeryId, leaveOpen, leaveCredit));
 
     }
+
+    public void getNumberOfDays(LeaveApplyRequest leaveRequest, EmployeeDetail employeeDetail) throws CommonException {
+
+                double noOfDays = Double.parseDouble(leaveRequest.getNoOfDays());
+
+                Timestamp reqStartDt = Timestamp.valueOf(leaveRequest.getStartDt());
+                Timestamp reqEndDt = Timestamp.valueOf(leaveRequest.getEndDt());
+
+                ShiftRoster empShiftRosterList = shiftRosterRepo.findByEmployeeIdAndMonthGreaterThanEqualAndMonthLessThanEqualAndYearGreaterThanEqualAndYearLessThanEqual(employeeDetail.getId(), reqStartDt.toLocalDateTime().getMonthValue(), reqEndDt.toLocalDateTime().getMonthValue(), reqStartDt.toLocalDateTime().getYear(), reqStartDt.toLocalDateTime().getYear());
+
+                LeaveTransaction leaveTransactions = leaveTransactionRepo.findTopByEmployeeIdAndStatus(employeeDetail.getId(),EnumStatus.ACTIVE);
+
+                double noShiftDays = businessValidationService.countShiftDays(empShiftRosterList, reqStartDt, reqEndDt);
+
+                EnumLeaveClubbingType clubbingType = this.findLeaveClubbingType(leaveTransactions.getLeaveTypeId());
+
+                if (clubbingType != null) {
+                    leaveRequest.setNoOfDays(String.valueOf(noOfDays + noShiftDays));
+                }
+
+        }
+
+
+
+    private EnumLeaveClubbingType findLeaveClubbingType(LeaveType leaveTypeId) throws CommonException {
+
+            if ((leaveTypeId.getClubHoliday() == EnumTrueFalse.TRUE.getBinaryValue()
+                    && leaveTypeId.getClubWeekEnd() == EnumTrueFalse.TRUE.getBinaryValue())) {
+                return EnumLeaveClubbingType.CLUB_BOTH;
+            } else if (leaveTypeId.getClubHoliday() == EnumTrueFalse.TRUE.getBinaryValue()) {
+                return EnumLeaveClubbingType.CLUB_HOLIDAY;
+            } else if (leaveTypeId.getClubWeekEnd() == EnumTrueFalse.TRUE.getBinaryValue()) {
+                return EnumLeaveClubbingType.CLUB_WEEKEND;
+            } else {
+                return null;
+            }
+        }
 }
 

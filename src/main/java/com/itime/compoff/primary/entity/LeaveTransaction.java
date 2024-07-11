@@ -30,7 +30,7 @@ public class LeaveTransaction implements Serializable{
 	@Column(name = "employee_id", nullable = false)
 	private long employeeId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "leave_type_id ", referencedColumnName = "Id", nullable = false)
 	private LeaveType leaveTypeId;
 

@@ -57,4 +57,10 @@ public class LeaveType implements Serializable {
     @Column(name = "last_updated_by", nullable = false)
     private String lastUpdatedBy;
 
+    @Column(name = "club_weekend_leaves", nullable = false)
+    private int clubWeekEnd;
+
+    @Column(name = "club_holidays_leaves", nullable = false)
+    private int clubHoliday;
+
 }

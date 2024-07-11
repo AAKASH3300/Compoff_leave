@@ -92,15 +92,14 @@ public class CompOffTransactionServiceImplTest {
         when(mockCompOffMapper.mapApplyRequestToEntity(any(EmployeeDetail.class),
                 any(CompOffApplyRequest.class))).thenReturn(compOffTransaction);
 
-        // Run the test
+        Timestamp requestDate = Timestamp.valueOf(compOffApplyRequest.getRequestedDate());
+
         final HttpStatus result = compOffTransactionServiceImplUnderTest.createCompOffTransaction(compOffApplyRequest);
 
-        // Verify the results
-        assertEquals(HttpStatus.OK, result);
+        assertEquals(HttpStatus.CREATED, result);
         verify(mockBusinessValidationService).duplicateCompOffValidation(any(EmployeeDetail.class),
                 any(CompOffApplyRequest.class));
-        verify(mockBusinessValidationService).validateCompOff(any(CompOffApplyRequest.class),
-                eq(Timestamp.valueOf(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0))));
+        verify(mockBusinessValidationService).validateCompOff(compOffApplyRequest,requestDate);
         verify(mockCompOffTransactionRepo).save(any(CompOffTransaction.class));
     }
 
@@ -123,22 +122,21 @@ public class CompOffTransactionServiceImplTest {
 
     @Test
     public void testCreateCompOffTransaction_BusinessValidationServiceDuplicateCompOffValidationThrowsCommonException() throws Exception {
-        // Setup
-        final CompOffApplyRequest compOffApplyRequest = new CompOffApplyRequest();
-        compOffApplyRequest.setEmployeeId(0L);
-        compOffApplyRequest.setRequestedDate("requestedDate");
-        compOffApplyRequest.setPunchIn("punchIn");
-        compOffApplyRequest.setPunchOut("punchOut");
-        compOffApplyRequest.setWorkHours("workHours");
 
-        // Configure BusinessValidationService.findEmployeeDetail(...).
+        final CompOffApplyRequest compOffApplyRequest = new CompOffApplyRequest();
+        compOffApplyRequest.setEmployeeId(1L);
+        compOffApplyRequest.setRequestedDate("2024-07-08 00:00:00");
+        compOffApplyRequest.setPunchIn("11:00:00");
+        compOffApplyRequest.setPunchOut("19:00:00");
+        compOffApplyRequest.setWorkHours("8");
+
         final EmployeeDetail employeeDetail = new EmployeeDetail();
         employeeDetail.setId(0L);
-        employeeDetail.setEmpId("empId");
-        employeeDetail.setFirstName("firstName");
-        employeeDetail.setLastName("lastName");
-        employeeDetail.setOfficialEmail("officialEmail");
-        when(mockBusinessValidationService.findEmployeeDetail(0L)).thenReturn(employeeDetail);
+        employeeDetail.setEmpId("101");
+        employeeDetail.setFirstName("Aakash");
+        employeeDetail.setLastName("B");
+        employeeDetail.setOfficialEmail("aakash.b@aaludra.com");
+        when(mockBusinessValidationService.findEmployeeDetail(1L)).thenReturn(employeeDetail);
 
         doThrow(CommonException.class).when(mockBusinessValidationService).duplicateCompOffValidation(
                 any(EmployeeDetail.class), any(CompOffApplyRequest.class));
@@ -150,15 +148,14 @@ public class CompOffTransactionServiceImplTest {
 
     @Test
     public void testCreateCompOffTransaction_BusinessValidationServiceValidateCompOffThrowsCommonException() throws Exception {
-        // Setup
-        final CompOffApplyRequest compOffApplyRequest = new CompOffApplyRequest();
-        compOffApplyRequest.setEmployeeId(0L);
-        compOffApplyRequest.setRequestedDate("requestedDate");
-        compOffApplyRequest.setPunchIn("punchIn");
-        compOffApplyRequest.setPunchOut("punchOut");
-        compOffApplyRequest.setWorkHours("workHours");
 
-        // Configure BusinessValidationService.findEmployeeDetail(...).
+        final CompOffApplyRequest compOffApplyRequest = new CompOffApplyRequest();
+        compOffApplyRequest.setEmployeeId(1L);
+        compOffApplyRequest.setRequestedDate("2024-07-08 00:00:00");
+        compOffApplyRequest.setPunchIn("11:00:00");
+        compOffApplyRequest.setPunchOut("19:00:00");
+        compOffApplyRequest.setWorkHours("8");
+
         final EmployeeDetail employeeDetail = new EmployeeDetail();
         employeeDetail.setId(0L);
         employeeDetail.setEmpId("empId");
@@ -167,14 +164,13 @@ public class CompOffTransactionServiceImplTest {
         employeeDetail.setOfficialEmail("officialEmail");
         when(mockBusinessValidationService.findEmployeeDetail(0L)).thenReturn(employeeDetail);
 
-        doThrow(CommonException.class).when(mockBusinessValidationService).validateCompOff(
-                any(CompOffApplyRequest.class), eq(Timestamp.valueOf(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0))));
+        Timestamp requestDate = Timestamp.valueOf(compOffApplyRequest.getRequestedDate());
 
-        // Run the test
+        doThrow(CommonException.class).when(mockBusinessValidationService).validateCompOff(compOffApplyRequest,requestDate);
+
         assertThrows(CommonException.class,
                 () -> compOffTransactionServiceImplUnderTest.createCompOffTransaction(compOffApplyRequest));
-        verify(mockBusinessValidationService).duplicateCompOffValidation(any(EmployeeDetail.class),
-                any(CompOffApplyRequest.class));
+        verify(mockBusinessValidationService).duplicateCompOffValidation(employeeDetail,compOffApplyRequest);
     }
 
     @Test

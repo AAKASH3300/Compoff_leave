@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Component
 public class BusinessValidationService {
@@ -162,6 +163,17 @@ public class BusinessValidationService {
                 Timestamp.valueOf(applyLeaveRequest.getStartDt()).before(new Date())) {
             throw new CommonException(ErrorMessages.INVALID_COMPOFF_TIME_RANGE);
         }
+    }
+
+    public int countShiftDays(ShiftRoster shiftRoster, Timestamp startDate, Timestamp endDate) {
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return (int) Stream.iterate(startLocalDate, date -> date.plusDays(1))
+                .limit(ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1)
+                .map(date -> getShiftValue(shiftRoster, Timestamp.valueOf(date.atStartOfDay())))
+                .filter(shiftValue -> shiftValue == 0 || shiftValue == -1)
+                .count();
     }
 
 }
